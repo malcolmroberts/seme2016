@@ -1,27 +1,25 @@
 #!/usr/bin/python
-
 import csv
 import numpy as np
-
 import matplotlib.pyplot as plt
 
 filename = 'data/PARRUN_ALL.csv'
-print "filename:", filename
-
+print "Opening file:", filename
 csvfile =  open(filename, 'rb')
 csvreader = csv.reader(csvfile, delimiter=',')
 
 outbounddatecol = 1
 
-
 rowdata = []
-
 for row in csvreader:
     rowdata.append(row)
-       
+
 # find all unique dates.
+# vector that will contain the unique dates as strings:
 dates = []
-nflights = []
+# for each single date we store here the number of flights
+# corresponding to a certain date:
+nflights = [] 
 
 i = 1
 while i < len(rowdata):
@@ -38,24 +36,27 @@ while i < len(rowdata):
         nflights.append(1)
     i += 1
 
-print "Unique dates:", len(dates)
-
-print "number of flights:", nflights
+print "Number of unique dates found:", len(dates)
+#print "Number of flights for each of these dates:", nflights
 
 ndays = 130
 
-datas = []
+#vector of matrix that will contain the prices of all the flights of a
+#certain date
+datas = [] 
+
+# initialization
 j = 0
 while j < len(nflights):
     datas.append(np.zeros((nflights[j], ndays)))
     j += 1
-
-print len(datas)
     
 offset = 9
 
+# a counter
 lasti = np.zeros(len(nflights))
 
+# loop to put a minus -1 where the price are missing
 i = 1
 while i < len(rowdata):
     fj = -1
@@ -78,7 +79,7 @@ while i < len(rowdata):
         print "fj is -1!!! on date", rowdata[i][1][0:10]
     i += 1
 
-
+# algorithm
 def falpha(pt0, T, pdemand):
     if(pdemand >= pt0):
         return 1
@@ -86,6 +87,7 @@ def falpha(pt0, T, pdemand):
         return 0
     return 1.0 / (1.0 + np.exp(-11 * pdemand / pt0) * 4500 * pt0 / (10.5 * T) )
 
+#utility function
 def testpdemand(pmin, pdemand):
     i = 0
     while i < len(pmin):
@@ -94,17 +96,13 @@ def testpdemand(pmin, pdemand):
         i += 1
     return i
 
-# parameter
+# parameters
 maxsavings = 0.35
 
 npd = 200
 ndays = 130
 
-t0 = 0
-success = np.zeros((npd + 1, ndays))
-
-pt0s = []
-
+# for each group of flights
 idata = 0
 while idata < len(dates):
     print "idata:", idata, "of", len(dates), \
@@ -113,11 +111,13 @@ while idata < len(dates):
     data = datas[idata]
     pmin = np.zeros((ndays))
 
+    # initialization of pmin to inf
     i = 0
     while i < len(pmin):
         pmin[i] = float("inf")
         i += 1
 
+    # We compute the minimum price for each day: the current price p(t)
     i = 0
     while i < nflights[idata]:
         j = 0
@@ -129,106 +129,94 @@ while idata < len(dates):
             j += 1
         i += 1
 
-    print "pmin:", pmin
+    print "Best price of the day for this group of flights:", pmin
     
-    pt0 = 0
-    if pmin[t0] != float("inf"):
-        pt0 = pmin[t0]
-    if(pt0 == 0):
+    t0 = 0
+
+    maxdays = ndays - 1
+    while t0 < maxdays:
+        pt0 = 0
         t00 = t0
+
+        # identifying the current price: skipping the "inf" first to
+        # the past than to the future!
+        if pmin[t0] != float("inf"):
+            pt0 = pmin[t0]
         while pt0 == 0 and t00 >= 0:
             if(pmin[t00] != float("inf")):
                 pt0 = pmin[t00]
-            t00 -= 1
+            else:
+                t00 -= 1
         while pt0 == 0:
             if(pmin[t00] != float("inf")):
                 pt0 = pmin[t00]
             t00 += 1
-    print "pt0:", pt0
+        print "t0:", t0, "pt0:", pt0
 
-    pt0s.append(pt0)
-    
-    pdmax = pt0
-    pdmin = (1 - maxsavings) * pdmax
+        pdmax = pt0
+        pdmin = (1 - maxsavings) * pdmax
+        deltapd = (pdmax - pdmin) / npd
 
-    deltapd = (pdmax - pdmin) / npd
-
-    i = 0
-    while i <= npd:
-        pdemand = pdmin + i * deltapd
-        iTgood = testpdemand(pmin, pdemand)
-        j = 0
-        while j < ndays:
-            if(j < iTgood):
-                success[i][j] += 0
-            else:
-                success[i][j] += 1
-            j += 1
-        i += 1
+        alpha = np.zeros((npd + 1, ndays-t0))
+        success = np.zeros((npd + 1, ndays-t0))
         
-    alpha = np.zeros((npd + 1, ndays))
-        
-    i = 0
-    while i <= npd:
-        pdemand = pdmin + i * deltapd
-        jalpha = []
-        j = 0
-        while j < ndays:
-            alpha[i][j] = falpha(pt0, j, pdemand)
-            j += 1
-        i += 1
-
-    x = range(0, 130)
-    y = []
-    i = 0
-    deltasavings = maxsavings / npd
-    while i <= npd:
-        y.append((1 - maxsavings) + i * deltasavings)
-        i += 1
-
-    difference = success - alpha
-    score = 1 - abs(difference)
+        i = 0
+        while i <= npd:
+            pdemand = pdmin + i * deltapd
+            iTgood = testpdemand(pmin, pdemand)
+            j = 0
+            while j < ndays-t0:
+                if(j < iTgood):
+                    success[i][j] = 0
+                else:
+                    success[i][j] = 1
+                j += 1
+            i += 1
     
-    # outname = "success" + str(idata) + ".dat"
-    # print "Writing output to", outname
-    # with open(outname, 'wb') as csvfile:
-    #     csvwriter = csv.writer(csvfile, delimiter='\t', quotechar='#')
-    #     i = 0
-    #     while i < len(success):
-    #         csvwriter.writerow(success[i])
-    #         i += 1
+        
+        i = 0
+        while i <= npd:
+            pdemand = pdmin + i * deltapd
+            jalpha = []
+            j = 0
+            while j < ndays-t0:
+                alpha[i][j] = falpha(pt0, j, pdemand)
+                j += 1
+            i += 1
+
+        x = range(0, ndays-t0)
+        y = []
+        i = 0
+
+        deltasavings = maxsavings / npd
+        while i <= npd:
+            y.append((1 - maxsavings) + i * deltasavings)
+            i += 1
+
+        difference = success - alpha
+        score = 1 - abs(difference)
+
+        # X,Y = np.meshgrid(x,y)
+        # plt.subplot(131)
+        # plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
+        # plt.clim(0,1)
+        # plt.colorbar()
+
+        # plt.subplot(132)
+        # plt.contourf(X,Y,alpha,[0,0.2,0.4,0.6,0.8,1])
+        # plt.clim(0,1)
+        # plt.colorbar()
+
+        # plt.subplot(133)
+        # plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
+        # plt.clim(0,1)
+        # plt.colorbar()
+        
+        # plt.show()
+
+        t0 += 1
 
     idata += 1
 
-success /= idata
-    
-with open("pt0.dat", 'wb') as csvfile:
-    csvwriter = csv.writer(csvfile, delimiter='\t', quotechar='#')
-    i = 0
-    while i < len(pt0s):
-        csvwriter.writerow([pt0s[i]])
-        i += 1
-    
-X, Y = np.meshgrid(x, y)
-plt.contourf(X,Y,success,[0, 0.2, 0.4, 0.6, 0.8, 1])
-plt.clim(0, 1)
-plt.colorbar()
-plt.show()
 
-# outname = "alpha.dat"
-# print "Writing output to", outname
-# with open(outname, 'wb') as csvfile:
-#     csvwriter = csv.writer(csvfile, delimiter='\t', quotechar='#')
-#     i = 0
-#     while i < len(success):
-#         csvwriter.writerow(alpha[i])
-#         i += 1
-
-outname = "success.dat"
-print "Writing output to", outname
-with open(outname, 'wb') as csvfile:
-    csvwriter = csv.writer(csvfile, delimiter='\t', quotechar='#')
-    i = 0
-    while i < len(success):
-        csvwriter.writerow(success[i])
-        i += 1
+    
