@@ -45,19 +45,8 @@ for idata in range(0, len(datas)):
     
     data = datas[idata]
 
-    pmin = np.zeros((ndays))
-    # initialization of pmin to inf
-    for i in range(0, len(pmin)):
-        pmin[i] = float("inf")
+    pmin = findminprices(nflights[idata], data, ndays)
     
-    # We compute the minimum price for each day: the current price p(t)
-    for i in range(0, nflights[idata]):
-        for j in range(0, ndays):
-            price = data[i][j]
-            if(price != -1):
-                if(price < pmin[j]):
-                    pmin[j] = price
-
     print "Best price of the day for this group of flights:", pmin
 
     scoreOfThisGroup = []
@@ -67,22 +56,7 @@ for idata in range(0, len(datas)):
     t0 = 0
     maxdays = ndays - 1
     for t0 in range(0, maxdays, 10):
-        pt0 = 0
-        t00 = t0
-
-        # identifying the current price: skipping the "inf" first to
-        # the past than to the future!
-        if pmin[t0] != float("inf"):
-            pt0 = pmin[t0]
-        while pt0 == 0 and t00 >= 0:
-            if(pmin[t00] != float("inf")):
-                pt0 = pmin[t00]
-            else:
-                t00 -= 1
-        while pt0 == 0:
-            if(pmin[t00] != float("inf")):
-                pt0 = pmin[t00]
-            t00 += 1
+        pt0 = findstartprice(t0, pmin)
         print "t0:", t0, "pt0:", pt0
 
         pdmax = pt0
@@ -101,7 +75,6 @@ for idata in range(0, len(datas)):
         
         for i in range(0, npd + 1):
             pdemand = pdmin + i * deltapd
-            jalpha = []
             for j in range(0, ndays - t0):
                 alpha[i][j] = falpha(pt0, j, pdemand)
 
@@ -118,7 +91,6 @@ for idata in range(0, len(datas)):
         medianOfScore = np.median(score)
         medianOfThisGroup.append(medianOfScore)
         #stdOfThisGroup.append(stdOfScore)
-
 
         # i = 0
         # while i <= npd:
