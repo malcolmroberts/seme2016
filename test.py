@@ -91,6 +91,11 @@ if(pt0 == 0):
         if(pmin[t00] != float("inf")):
             pt0 = pmin[t00]
         t00 -= 1
+    while pt0 == 0:
+        if(pmin[t00] != float("inf")):
+            pt0 = pmin[t00]
+        t00 += 1
+        print t00
 print "pt0:", pt0
 
 savings = 0.35
