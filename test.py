@@ -93,7 +93,6 @@ npd = 200
 ndays = 130
 
 # for each group of flights
-idata = 0
 for idata in range(0, len(dates)):
     print "idata:", idata, "of", len(dates), \
         "date:", dates[idata], "nflights:", nflights[idata]
