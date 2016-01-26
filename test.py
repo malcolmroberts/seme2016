@@ -105,6 +105,8 @@ success = np.zeros((npd + 1, ndays))
 
 idata = 0
 while idata < len(datas):
+    print "date:", dates[idata], "nflights:", nflights[idata]
+    
     data = datas[idata]
 
     pmean = np.zeros((ndays))
@@ -195,13 +197,17 @@ while idata < len(datas):
     difference = success - alpha
     score = 1 - abs(difference)
     
-    X,Y = np.meshgrid(x,y)
-    plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
-    plt.clim(0,1)
-    plt.colorbar()
-    plt.show()
 
     idata += 1
+
+success /= len(nflights)
+    
+X,Y = np.meshgrid(x,y)
+plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
+plt.clim(0,1)
+plt.colorbar()
+plt.show()
+
     
 # outname = "success.dat"
 # print "Writing output to", outname
