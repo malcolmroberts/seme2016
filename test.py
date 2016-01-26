@@ -180,6 +180,8 @@ import matplotlib.pyplot as plt
 
 
 X,Y = np.meshgrid(x,y)
-plt.contourf(X,Y,score)
+plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
+plt.clim(0,1)
+plt.colorbar()
 plt.show()
 
