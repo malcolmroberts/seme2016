@@ -166,13 +166,10 @@ while idata < len(dates):
             iTgood = testpdemand(pmin, pdemand)
             j = 0
             while j < ndays-t0:
-                if(j < iTgood):
-                    success[i][j] = 0
-                else:
+                if(j >= iTgood):
                     success[i][j] = 1
                 j += 1
             i += 1
-    
         
         i = 0
         while i <= npd:
@@ -184,18 +181,18 @@ while idata < len(dates):
                 j += 1
             i += 1
 
-        x = range(0, ndays-t0)
-        y = []
-        i = 0
-
         deltasavings = maxsavings / npd
-        while i <= npd:
-            y.append((1 - maxsavings) + i * deltasavings)
-            i += 1
-
+            
         difference = success - alpha
         score = 1 - abs(difference)
 
+        # i = 0
+        # while i <= npd:
+        #     y.append((1 - maxsavings) + i * deltasavings)
+        #     i += 1
+        
+        # x = range(0, ndays-t0)
+        # y = []
         # X,Y = np.meshgrid(x,y)
         # plt.subplot(131)
         # plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
