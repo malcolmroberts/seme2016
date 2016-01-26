@@ -14,63 +14,65 @@ rowdata = []
 for row in csvreader:
     rowdata.append(row)
 
-# find all unique dates.
-# vector that will contain the unique dates as strings:
-dates = []
+def finduniquedates(rowdata):
+    nflights = []
+    dates = []
+    for i in range(1, len(rowdata)):
+        j = 0
+        idate = rowdata[i][1]
+        found = False
+        while j < len(dates) and not found:
+            if(dates[j][0:10] == idate[0:10]):
+                found = True
+                nflights[j] += 1
+            j += 1
+        if not found:
+            dates.append(idate[0:10])
+            nflights.append(1)
+    return dates, nflights
+
 # for each single date we store here the number of flights
 # corresponding to a certain date:
-nflights = [] 
-
-for i in range(1, len(rowdata)):
-    j = 0
-    idate = rowdata[i][1]
-    found = False
-    while j < len(dates) and not found:
-        if(dates[j][0:10] == idate[0:10]):
-            found = True
-            nflights[j] += 1
-        j += 1
-    if not found:
-        dates.append(idate[0:10])
-        nflights.append(1)
+# find all unique dates.
+# vector that will contain the unique dates as strings:
+dates, nflights = finduniquedates(rowdata)
 
 print "Number of unique dates found:", len(dates)
 #print "Number of flights for each of these dates:", nflights
 
 ndays = 130
+def organizedata(dates, nflights, rowdata):
+    datas = []
+    # initialization
+    j = 0
+    while j < len(nflights):
+        datas.append(np.zeros((nflights[j], ndays)))
+        j += 1
 
-#vector of matrix that will contain the prices of all the flights of a
-#certain date
-datas = [] 
+    # a counter
+    lasti = np.zeros(len(nflights))
+    offset = 9
 
-# initialization
-j = 0
-while j < len(nflights):
-    datas.append(np.zeros((nflights[j], ndays)))
-    j += 1
+    # loop to put a minus -1 where the price are missing
+    for i in range(1, len(rowdata)):
+        fj = -1
+        for j in range(0, len(dates)):
+            if(dates[j][0:10] == rowdata[i][1][0:10]):
+                fj = j
+        if(fj != -1):
+            fi = lasti[fj]
+            lasti[fj] += 1
+            for j in range(0, ndays):
+                if(rowdata[i][j + offset] != ""):
+                    datas[fj][fi][j] = float(rowdata[i][j + 9])
+                else:
+                    datas[fj][fi][j] = -1.0
+        else:
+            print "fj is -1!!! on date", rowdata[i][1][0:10]
+    return datas
+
+datas = organizedata(dates, nflights, rowdata)
     
-offset = 9
-
-# a counter
-lasti = np.zeros(len(nflights))
-
-# loop to put a minus -1 where the price are missing
-for i in range(1, len(rowdata)):
-    fj = -1
-    for j in range(0, len(dates)):
-        if(dates[j][0:10] == rowdata[i][1][0:10]):
-            fj = j
-    if(fj != -1):
-        fi = lasti[fj]
-        lasti[fj] += 1
-        for j in range(0, ndays):
-            if(rowdata[i][j + offset] != ""):
-                datas[fj][fi][j] = float(rowdata[i][j + 9])
-            else:
-                datas[fj][fi][j] = -1.0
-    else:
-        print "fj is -1!!! on date", rowdata[i][1][0:10]
-
 # algorithm
 def falpha(pt0, T, pdemand):
     if(pdemand >= pt0):
@@ -79,7 +81,7 @@ def falpha(pt0, T, pdemand):
         return 0
     return 1.0 / (1.0 + np.exp(-11 * pdemand / pt0) * 4500 * pt0 / (10.5 * T) )
 
-#utility function
+# utility function
 def testpdemand(pmin, pdemand):
     for i in range(0, len(pmin)):
         if(pmin[i] <= pdemand):
@@ -88,26 +90,19 @@ def testpdemand(pmin, pdemand):
 
 # parameters
 maxsavings = 0.35
-
 npd = 200
-ndays = 130
 
 # for each group of flights
-idata = 0
-pmean = np.zeros((ndays))
-count = np.zeros((ndays))
-pmin = np.zeros((ndays))
-# initialization of pmin to inf
-i = 0
-while i < len(pmin):
-    pmin[i] = float("inf")
-    i += 1
-
-while idata < len(datas):
+for idata in range(0, len(datas)):
     print "date:", dates[idata], "nflights:", nflights[idata]
     
     data = datas[idata]
 
+    pmin = np.zeros((ndays))
+    # initialization of pmin to inf
+    for i in range(0, len(pmin)):
+        pmin[i] = float("inf")
+    
     # We compute the minimum price for each day: the current price p(t)
     for i in range(0, nflights[idata]):
         for j in range(0, ndays):
@@ -118,8 +113,9 @@ while idata < len(datas):
 
     print "Best price of the day for this group of flights:", pmin
 
-    scoreOfThisGroup=[]
-    stdOfThisGroup=[]
+    scoreOfThisGroup = []
+    stdOfThisGroup = []
+    medianOfThisGroup = []
     
     t0 = 0
     maxdays = ndays - 1
@@ -171,6 +167,12 @@ while idata < len(datas):
         stdOfScore = np.std(score)
         scoreOfThisGroup.append(meanOfScore)
         stdOfThisGroup.append(stdOfScore)
+
+        medianOfScore = np.median(score)
+        medianOfThisGroup.append(medianOfScore)
+        #stdOfThisGroup.append(stdOfScore)
+
+
         # i = 0
         # while i <= npd:
         #     y.append((1 - maxsavings) + i * deltasavings)
@@ -195,7 +197,8 @@ while idata < len(datas):
         # plt.colorbar()
         
         # plt.show()
-    # plt.plot(scoreOfThisGroup)
+    plt.plot(medianOfThisGroup)
+
     plt.errorbar(range(0,len(scoreOfThisGroup)),scoreOfThisGroup,stdOfThisGroup)
     plt.ylim([0,1])
     plt.show()
