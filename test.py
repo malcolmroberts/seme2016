@@ -3,33 +3,16 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
+from utils import * 
+
 filename = 'data/PARRUN_ALL.csv'
 print "Opening file:", filename
 csvfile =  open(filename, 'rb')
 csvreader = csv.reader(csvfile, delimiter=',')
 
-outbounddatecol = 1
-
 rowdata = []
 for row in csvreader:
     rowdata.append(row)
-
-def finduniquedates(rowdata):
-    nflights = []
-    dates = []
-    for i in range(1, len(rowdata)):
-        j = 0
-        idate = rowdata[i][1]
-        found = False
-        while j < len(dates) and not found:
-            if(dates[j][0:10] == idate[0:10]):
-                found = True
-                nflights[j] += 1
-            j += 1
-        if not found:
-            dates.append(idate[0:10])
-            nflights.append(1)
-    return dates, nflights
 
 # for each single date we store here the number of flights
 # corresponding to a certain date:
@@ -41,37 +24,8 @@ print "Number of unique dates found:", len(dates)
 #print "Number of flights for each of these dates:", nflights
 
 ndays = 130
-def organizedata(dates, nflights, rowdata):
-    datas = []
-    # initialization
-    j = 0
-    while j < len(nflights):
-        datas.append(np.zeros((nflights[j], ndays)))
-        j += 1
 
-    # a counter
-    lasti = np.zeros(len(nflights))
-    offset = 9
-
-    # loop to put a minus -1 where the price are missing
-    for i in range(1, len(rowdata)):
-        fj = -1
-        for j in range(0, len(dates)):
-            if(dates[j][0:10] == rowdata[i][1][0:10]):
-                fj = j
-        if(fj != -1):
-            fi = lasti[fj]
-            lasti[fj] += 1
-            for j in range(0, ndays):
-                if(rowdata[i][j + offset] != ""):
-                    datas[fj][fi][j] = float(rowdata[i][j + 9])
-                else:
-                    datas[fj][fi][j] = -1.0
-        else:
-            print "fj is -1!!! on date", rowdata[i][1][0:10]
-    return datas
-
-datas = organizedata(dates, nflights, rowdata)
+datas = organizedata(dates, nflights, rowdata, ndays)
     
 # algorithm
 def falpha(pt0, T, pdemand):
@@ -80,13 +34,6 @@ def falpha(pt0, T, pdemand):
     if(T == 0):
         return 0
     return 1.0 / (1.0 + np.exp(-11 * pdemand / pt0) * 4500 * pt0 / (10.5 * T) )
-
-# utility function
-def testpdemand(pmin, pdemand):
-    for i in range(0, len(pmin)):
-        if(pmin[i] <= pdemand):
-            return i
-    return len(pmin) + 1
 
 # parameters
 maxsavings = 0.35
@@ -119,7 +66,7 @@ for idata in range(0, len(datas)):
     
     t0 = 0
     maxdays = ndays - 1
-    for t0 in range(0, maxdays):
+    for t0 in range(0, maxdays, 10):
         pt0 = 0
         t00 = t0
 
