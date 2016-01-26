@@ -34,7 +34,7 @@ while i < len(rowdata):
     i += 1
 
 print "Number of unique dates found:", len(dates)
-print "Number of flights for each of these dates:", nflights
+#print "Number of flights for each of these dates:", nflights
 
 ndays = 130
 datas = [] #vector of matrix that will contain the prices of all the flights of a certain date
@@ -93,11 +93,9 @@ def testpdemand(pmin, pdemand):
 maxsavings = 0.35
 npd = 2000
 ndays = 130
-t0 = 0
 
 
-success = np.zeros((npd + 1, ndays))
-
+# for each group of flights
 idata = 0
 while idata < len(datas):
     print "date:", dates[idata], "nflights:", nflights[idata]
@@ -108,11 +106,13 @@ while idata < len(datas):
     count = np.zeros((ndays))
     pmin = np.zeros((ndays))
 
+    # initialization of pmin to inf
     i = 0
     while i < len(pmin):
         pmin[i] = float("inf")
         i += 1
 
+    # We compute the minimum price for each day: the current price p(t)
     i = 0
     while i < nflights[idata]:
         j = 0
@@ -125,83 +125,100 @@ while idata < len(datas):
                     pmin[j] = price
             j += 1
         i += 1
-
-    j = 0
-    while j < ndays:
-        if(count[j] > 0):
-            pmean[j] /= count[j]
-        j += 1
-
+    print "Best price of the day for this group of flights:", pmin
+    #j = 0
+    #while j < ndays:
+    #    if(count[j] > 0):
+    #        pmean[j] /= count[j]
+    #    j += 1
     #print "mean:", pmean
-    print "min:", pmin
-
-    pt0 = 0
-    if pmin[t0] != float("inf"):
-        pt0 = pmin[t0]
-    if(pt0 == 0):
+    
+    t0=0
+    while t0 < ndays-1:
+        pt0 = 0
         t00 = t0
+        #identifying the current price: skipping the "inf" first to the past than to the future! 
+        if pmin[t0] != float("inf"):
+            pt0 = pmin[t0]
         while pt0 == 0 and t00 >= 0:
             if(pmin[t00] != float("inf")):
                 pt0 = pmin[t00]
-            t00 -= 1
+            else:
+                t00 -= 1
         while pt0 == 0:
             if(pmin[t00] != float("inf")):
                 pt0 = pmin[t00]
-            t00 += 1
-        print t00
-    print "pt0:", pt0
-
-    pdmax = pt0
-    pdmin = (1 - maxsavings) * pdmax
-
-    deltapd = (pdmax - pdmin) / npd
-
-    i = 0
-    while i <= npd:
-        pdemand = pdmin + i * deltapd
-        iTgood = testpdemand(pmin, pdemand)
-        j = 0
-        while j < ndays:
-            if(j < iTgood):
-                success[i][j] = 0
             else:
-                success[i][j] = 1
-            j += 1
-        i += 1
-        
-    alpha = np.zeros((npd + 1, ndays))
-        
-    i = 0
-    while i <= npd:
-        pdemand = pdmin + i * deltapd
-        jalpha = []
-        j = 0
-        while j < ndays:
-            alpha[i][j] = falpha(pt0, j, pdemand)
-            j += 1
-        i += 1
+                t00 += 1
+        print "t0:", t0
+        print "t00:", t00
+        print "pt0:", pt0
 
-    x = range(0, 130)
-    y = []
-    i = 0
-    deltasavings = maxsavings / npd
-    while i <= npd:
-        y.append((1 - maxsavings) + i * deltasavings)
-        i += 1
+        pdmax = pt0
+        pdmin = (1 - maxsavings) * pdmax
+        deltapd = (pdmax - pdmin) / npd
 
-    difference = success - alpha
-    score = 1 - abs(difference)
+        alpha = np.zeros((npd + 1, ndays-t0))
+        success = np.zeros((npd + 1, ndays-t0))
+        
+        i = 0
+        while i <= npd:
+            pdemand = pdmin + i * deltapd
+            iTgood = testpdemand(pmin, pdemand)
+            j = 0
+            while j < ndays-t0:
+                if(j < iTgood):
+                    success[i][j] = 0
+                else:
+                    success[i][j] = 1
+                j += 1
+            i += 1
     
+        
+        i = 0
+        while i <= npd:
+            pdemand = pdmin + i * deltapd
+            jalpha = []
+            j = 0
+            while j < ndays-t0:
+                alpha[i][j] = falpha(pt0, j, pdemand)
+                j += 1
+            i += 1
 
+        x = range(0, ndays-t0)
+        y = []
+        i = 0
+
+        deltasavings = maxsavings / npd
+        while i <= npd:
+            y.append((1 - maxsavings) + i * deltasavings)
+            i += 1
+
+        difference = success - alpha
+        score = 1 - abs(difference)
+
+        X,Y = np.meshgrid(x,y)
+        plt.subplot(131)
+        plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
+        plt.clim(0,1)
+        plt.colorbar()
+
+        plt.subplot(132)
+        plt.contourf(X,Y,alpha,[0,0.2,0.4,0.6,0.8,1])
+        plt.clim(0,1)
+        plt.colorbar()
+
+        plt.subplot(133)
+        plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
+        plt.clim(0,1)
+        plt.colorbar()
+        
+        plt.show()
+
+        t0+=1
     idata += 1
 
-success /= len(nflights)
     
-X,Y = np.meshgrid(x,y)
-plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
-plt.clim(0,1)
-plt.colorbar()
-plt.show()
 
     
 # outname = "success.dat"
