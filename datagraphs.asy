@@ -11,6 +11,8 @@ scale(Linear,Linear);
 
 bool dolegend=false;
 
+real ymax = 2.0;
+
 string filenames=getstring("filenames");
 string filename;
 string legendlist="";
@@ -43,8 +45,8 @@ while(flag) {
     real[] y=a[1];
     pen p=Pen(n);
     if(n == 1) p += dashed;
-    if(n == 2) p=darkgreen+Dotted;
-    draw(graph(x,y),p,myleg ? legends[n] : texify(filename));
+    if(n == 2) p = darkgreen + Dotted;
+    draw(graph(x,y,y < ymax), p,myleg ? legends[n] : texify(filename));
   }
 }
 
