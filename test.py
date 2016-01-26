@@ -195,7 +195,6 @@ while idata < len(datas):
         # plt.colorbar()
         
         # plt.show()
-        t0+=1
     # plt.plot(scoreOfThisGroup)
     plt.errorbar(range(0,len(scoreOfThisGroup)),scoreOfThisGroup,stdOfThisGroup)
     plt.ylim([0,1])
