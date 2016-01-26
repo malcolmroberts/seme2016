@@ -97,20 +97,19 @@ ndays = 130
 
 # for each group of flights
 idata = 0
+pmean = np.zeros((ndays))
+count = np.zeros((ndays))
+pmin = np.zeros((ndays))
+# initialization of pmin to inf
+i = 0
+while i < len(pmin):
+    pmin[i] = float("inf")
+    i += 1
+
 while idata < len(datas):
     print "date:", dates[idata], "nflights:", nflights[idata]
     
     data = datas[idata]
-
-    pmean = np.zeros((ndays))
-    count = np.zeros((ndays))
-    pmin = np.zeros((ndays))
-
-    # initialization of pmin to inf
-    i = 0
-    while i < len(pmin):
-        pmin[i] = float("inf")
-        i += 1
 
     # We compute the minimum price for each day: the current price p(t)
     i = 0
@@ -119,20 +118,14 @@ while idata < len(datas):
         while j < ndays:
             price = data[i][j]
             if(price != -1):
-                pmean[j] += price
-                count[j] += 1
                 if(price < pmin[j]):
                     pmin[j] = price
             j += 1
         i += 1
     print "Best price of the day for this group of flights:", pmin
-    #j = 0
-    #while j < ndays:
-    #    if(count[j] > 0):
-    #        pmean[j] /= count[j]
-    #    j += 1
-    #print "mean:", pmean
-    
+
+    scoreOfThisGroup=[]
+    stdOfThisGroup=[]
     t0=0
     while t0 < ndays-1:
         pt0 = 0
@@ -197,25 +190,34 @@ while idata < len(datas):
         difference = success - alpha
         score = 1 - abs(difference)
 
+        meanOfScore = np.mean(score)
+        stdOfScore = np.std(score)
+        scoreOfThisGroup.append(meanOfScore)
+        stdOfThisGroup.append(stdOfScore)
+        print "mean score for current t0:",meanOfScore,stdOfScore
         X,Y = np.meshgrid(x,y)
-        plt.subplot(131)
-        plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
-        plt.clim(0,1)
-        plt.colorbar()
+        # plt.subplot(131)
+        # plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
+        # plt.clim(0,1)
+        # plt.colorbar()
 
-        plt.subplot(132)
-        plt.contourf(X,Y,alpha,[0,0.2,0.4,0.6,0.8,1])
-        plt.clim(0,1)
-        plt.colorbar()
+        # plt.subplot(132)
+        # plt.contourf(X,Y,alpha,[0,0.2,0.4,0.6,0.8,1])
+        # plt.clim(0,1)
+        # plt.colorbar()
 
-        plt.subplot(133)
-        plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
-        plt.clim(0,1)
-        plt.colorbar()
+        # plt.subplot(133)
+        # plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
+        # plt.clim(0,1)
+        # plt.colorbar()
         
-        plt.show()
+        # plt.show()
 
         t0+=1
+    # plt.plot(scoreOfThisGroup)
+    plt.errorbar(range(0,len(scoreOfThisGroup)),scoreOfThisGroup,stdOfThisGroup)
+    plt.ylim([0,1])
+    plt.show()
     idata += 1
 
     
