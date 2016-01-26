@@ -1,27 +1,22 @@
 #!/usr/bin/python
-
 import csv
 import numpy as np
-
 import matplotlib.pyplot as plt
 
 filename = 'data/PARRUN_ALL.csv'
-print "filename:", filename
-
+print "Opening file:", filename
 csvfile =  open(filename, 'rb')
 csvreader = csv.reader(csvfile, delimiter=',')
 
 outbounddatecol = 1
 
-
 rowdata = []
-
 for row in csvreader:
     rowdata.append(row)
-       
+
 # find all unique dates.
-dates = []
-nflights = []
+dates = []    # vector that will contain the unique dates as strings
+nflights = [] # for each single date we store here the number of flights corresponding to a certain date
 
 i = 1
 while i < len(rowdata):
@@ -38,24 +33,23 @@ while i < len(rowdata):
         nflights.append(1)
     i += 1
 
-print "Unique dates:", len(dates)
-
-print "number of flights:", nflights
+print "Number of unique dates found:", len(dates)
+print "Number of flights for each of these dates:", nflights
 
 ndays = 130
-
-datas = []
+datas = [] #vector of matrix that will contain the prices of all the flights of a certain date
+# initialization
 j = 0
 while j < len(nflights):
     datas.append(np.zeros((nflights[j], ndays)))
     j += 1
-
-print len(datas)
     
 offset = 9
 
+# a counter
 lasti = np.zeros(len(nflights))
 
+# loop to put a minus -1 where the price are missing
 i = 1
 while i < len(rowdata):
     fj = -1
@@ -78,7 +72,7 @@ while i < len(rowdata):
         print "fj is -1!!! on date", rowdata[i][1][0:10]
     i += 1
 
-
+# algorithm
 def falpha(pt0, T, pdemand):
     if(pdemand >= pt0):
         return 1
@@ -86,6 +80,7 @@ def falpha(pt0, T, pdemand):
         return 0
     return 1.0 / (1.0 + np.exp(-11 * pdemand / pt0) * 4500 * pt0 / (10.5 * T) )
 
+#utility function
 def testpdemand(pmin, pdemand):
     i = 0
     while i < len(pmin):
@@ -94,13 +89,13 @@ def testpdemand(pmin, pdemand):
         i += 1
     return i
 
-# parameter
+# parameters
 maxsavings = 0.35
-
 npd = 2000
 ndays = 130
-
 t0 = 0
+
+
 success = np.zeros((npd + 1, ndays))
 
 idata = 0
