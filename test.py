@@ -97,20 +97,20 @@ def testpdemand(pmin, pdemand):
 # parameter
 maxsavings = 0.35
 
-npd = 2000
+npd = 200
 ndays = 130
 
 t0 = 0
 success = np.zeros((npd + 1, ndays))
 
+pt0s = []
+
 idata = 0
-while idata < len(datas):
-    print "date:", dates[idata], "nflights:", nflights[idata]
+while idata < len(dates):
+    print "idata:", idata, "of", len(dates), \
+        "date:", dates[idata], "nflights:", nflights[idata]
     
     data = datas[idata]
-
-    pmean = np.zeros((ndays))
-    count = np.zeros((ndays))
     pmin = np.zeros((ndays))
 
     i = 0
@@ -124,22 +124,13 @@ while idata < len(datas):
         while j < ndays:
             price = data[i][j]
             if(price != -1):
-                pmean[j] += price
-                count[j] += 1
                 if(price < pmin[j]):
                     pmin[j] = price
             j += 1
         i += 1
 
-    j = 0
-    while j < ndays:
-        if(count[j] > 0):
-            pmean[j] /= count[j]
-        j += 1
-
-    #print "mean:", pmean
-    print "min:", pmin
-
+    print "pmin:", pmin
+    
     pt0 = 0
     if pmin[t0] != float("inf"):
         pt0 = pmin[t0]
@@ -153,9 +144,10 @@ while idata < len(datas):
             if(pmin[t00] != float("inf")):
                 pt0 = pmin[t00]
             t00 += 1
-        print t00
     print "pt0:", pt0
 
+    pt0s.append(pt0)
+    
     pdmax = pt0
     pdmin = (1 - maxsavings) * pdmax
 
@@ -168,9 +160,9 @@ while idata < len(datas):
         j = 0
         while j < ndays:
             if(j < iTgood):
-                success[i][j] = 0
+                success[i][j] += 0
             else:
-                success[i][j] = 1
+                success[i][j] += 1
             j += 1
         i += 1
         
@@ -197,26 +189,31 @@ while idata < len(datas):
     difference = success - alpha
     score = 1 - abs(difference)
     
+    # outname = "success" + str(idata) + ".dat"
+    # print "Writing output to", outname
+    # with open(outname, 'wb') as csvfile:
+    #     csvwriter = csv.writer(csvfile, delimiter='\t', quotechar='#')
+    #     i = 0
+    #     while i < len(success):
+    #         csvwriter.writerow(success[i])
+    #         i += 1
 
     idata += 1
 
-success /= len(nflights)
+success /= idata
     
-X,Y = np.meshgrid(x,y)
-plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
-plt.clim(0,1)
+with open("pt0.dat", 'wb') as csvfile:
+    csvwriter = csv.writer(csvfile, delimiter='\t', quotechar='#')
+    i = 0
+    while i < len(pt0s):
+        csvwriter.writerow([pt0s[i]])
+        i += 1
+    
+X, Y = np.meshgrid(x, y)
+plt.contourf(X,Y,success,[0, 0.2, 0.4, 0.6, 0.8, 1])
+plt.clim(0, 1)
 plt.colorbar()
 plt.show()
-
-    
-# outname = "success.dat"
-# print "Writing output to", outname
-# with open('success.dat', 'wb') as csvfile:
-#     csvwriter = csv.writer(csvfile, delimiter='\t', quotechar='#')
-#     i = 0
-#     while i < len(success):
-#         csvwriter.writerow(success[i])
-#         i += 1
 
 # outname = "alpha.dat"
 # print "Writing output to", outname
@@ -226,3 +223,12 @@ plt.show()
 #     while i < len(success):
 #         csvwriter.writerow(alpha[i])
 #         i += 1
+
+outname = "success.dat"
+print "Writing output to", outname
+with open(outname, 'wb') as csvfile:
+    csvwriter = csv.writer(csvfile, delimiter='\t', quotechar='#')
+    i = 0
+    while i < len(success):
+        csvwriter.writerow(success[i])
+        i += 1
