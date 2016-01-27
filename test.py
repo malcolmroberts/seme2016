@@ -200,7 +200,8 @@ def main(argv):
 
     myTitle = flightInfo +' '+' '+ kind+'. Score'
     plt.title(myTitle)
-    plt.show()
+    plt.savefig(outdir+'/Score'+volStart+volEnd+'_'+kind)
+    #plt.show()
 
 # The main program is called from here
 if __name__ == "__main__":
