@@ -6,7 +6,7 @@ import sys
 import os
 import getopt
 from utils import * 
-
+    
 def showmap(npd, maxsavings, deltasavings, success, ndays, t0, alpha, score):
     # grid preparation
     y = []
@@ -46,6 +46,10 @@ def main(argv):
     showColorMaps = False
     domeansuccess = False
     
+    # parameters
+    maxsavings = 0.35
+    npd = 200
+
     usage = '''
 ./test.py
     -f <input filename>    : input filename
@@ -137,9 +141,6 @@ def main(argv):
         return 1.0 / (1.0 + np.exp(-11 * pdemand / pt0) * \
                       4500 * pt0 / (10.5 * T) )
 
-    # parameters
-    maxsavings = 0.35
-    npd = 200
 
     maxdays = ndays - 1
 
@@ -203,9 +204,6 @@ def main(argv):
                     if(j >= iTgood):
                         success[i][j] = 1
             
-            if(domeansuccess):
-                meansuccess[t0index] += success
-                
             if(writesuccess):
                 outdirt0 = outdir + "/t0_" + str(t0)
                 fileout = outdirt0 + "/success" + str(idata) + ".dat"
@@ -223,6 +221,9 @@ def main(argv):
                 pdemand = pdmin + i * deltapd
                 for j in range(0, ndays - t0):
                     alpha[i][j] = falpha(pt0, j, pdemand)
+
+            if(domeansuccess):
+                meansuccess[t0index] += success - alpha
 
             deltasavings = maxsavings / npd
 
@@ -254,6 +255,19 @@ def main(argv):
         plt.title(flightInfo + ' ' + ' ' + kind + '. Score')
         plt.savefig(outdir + '/Score' + volStart + volEnd + '_' + kind)
         plt.show()
+        
+    if(domeansuccess):
+        for i in range(0, len(meansuccess)):
+            meansuccess[i] /= meansuccesscount
+            outfilei = "meansuccess" + str(i) + ".dat"
+            if not os.path.exists(outdir):
+                os.makedirs(outdir)
+            with open(outdir + "/" + outfilei, 'wb') as csvfile:
+                datawriter = csv.writer(csvfile, delimiter='\t', \
+                                        quotechar='#')
+                for j in range(0, len(meansuccess[i])):
+                    datawriter.writerow(meansuccess[i][j])
+    
         
 # The main program is called from here
 if __name__ == "__main__":
