@@ -46,6 +46,7 @@ def main(argv):
     showColorMaps = False
     domeansuccess = False
     subalpha = True
+    verbose = False
     
     # parameters
     maxsavings = 0.35
@@ -64,10 +65,11 @@ def main(argv):
     -k <median or mean>: in score image use either the mean or the
        median (ignored if -m=0).
     -c <0 or 1> : show the color maps for each flight.
+    -v : verbose output
     '''
 
     try:
-        opts, args = getopt.getopt(argv,"f:a:d:s:S:w:m:M:k:c:h")
+        opts, args = getopt.getopt(argv,"f:a:d:s:S:w:m:M:k:c:hv")
     except getopt.GetoptError:
         print usage
         sys.exit(2)
@@ -95,6 +97,8 @@ def main(argv):
             kindOfStat = arg
         if opt in ("-c"):
             showColorMaps = (int(arg) == 1)
+        if opt in ("-v"):
+            verbose = True
             
     if showColorMaps and exportScore:
         print 'The options exportScore and showColorMaps are not compatible!'
@@ -119,10 +123,13 @@ def main(argv):
     csvfile =  open(filename, 'rb')
     csvreader = csv.reader(csvfile, delimiter=',')
 
+    
     rowdata = []
     for row in csvreader:
         rowdata.append(row)
 
+    print len(rowdata) - 1, "flights found."
+        
     # for each single date we store here the number of flights
     # corresponding to a certain date:
     # find all unique dates.
@@ -165,7 +172,8 @@ def main(argv):
 
     # for each group of flights
     for idata in range(0, len(datas), groupskip):
-        print "date:", dates[idata], "nflights:", nflights[idata]
+        print "date:", dates[idata], "nflights:", nflights[idata], \
+            "\t", idata, "/", len(datas) / groupskip
 
         meansuccesscount += 1
         
@@ -173,7 +181,7 @@ def main(argv):
 
         pmin = findminprices(nflights[idata], data, ndays)
 
-        print "pmin:", pmin
+        #print "pmin:", pmin
         
         if exportScore:
             if kindOfStat == 'mean':
@@ -192,7 +200,8 @@ def main(argv):
 
         for t0 in range(0, maxdays, t0skip):
             pt0 = findstartprice(t0, pmin)
-            print "t0:", t0, "pt0:", pt0
+            if(verbose):
+                print "t0:", t0, "pt0:", pt0
 
             t0index += 1
             
@@ -260,6 +269,7 @@ def main(argv):
             if kindOfStat == 'median' :
                 plt.plot(medianOfThisGroup)
             plt.ylim([0,1])
+
     if (exportScore):
         plt.title(flightInfo + ' ' + ' ' + kind + '. Score')
         plt.savefig(outdir + '/Score' + volStart + volEnd + '_' + kind)
@@ -276,7 +286,8 @@ def main(argv):
                                         quotechar='#')
                 for j in range(0, len(meansuccess[i])):
                     datawriter.writerow(meansuccess[i][j])
-    
+                    
+    print "Finished processing", filename, "Output in:", outdir
         
 # The main program is called from here
 if __name__ == "__main__":

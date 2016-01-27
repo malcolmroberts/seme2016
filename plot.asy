@@ -1,4 +1,4 @@
-size(12cm,12cm);
+size(12cm,10cm,IgnoreAspect);
 
 import graph;
 import palette;
@@ -26,9 +26,19 @@ else {
 
 //image(v, (0,0), (1,1), Palette);
 
+real maxsavings = 0.35;
+
 picture bar;
-bounds range=image(f,(0,0),(1,1),Palette);
-palette(bar,"$A$",range,(0,0),(0.5cm,8cm),Right,Palette,
+bounds range=image(f,(0,1.0 - maxsavings),(1,1),Palette);
+
+// Make the colour bar go from 0 to 1:
+range.min = 0;
+range.max = 1;
+
+palette(bar,"probabilty of success",range,(0,0),(0.5cm,6cm),Right,Palette,
         PaletteTicks("$%+#.1f$"));
 add(bar.fit(),point(E),30E);
 
+
+xaxis("time",BottomTop,RightTicks,above=true);
+yaxis("$p_d/p(t_0)$",LeftRight,LeftTicks,above=true);
