@@ -46,7 +46,8 @@ while(flag) {
     pen p=Pen(n);
     if(n == 1) p += dashed;
     if(n == 2) p = darkgreen + Dotted;
-    draw(graph(x,y,y < ymax), p,myleg ? legends[n] : texify(filename));
+    //draw(graph(x,y,y < ymax), p,myleg ? legends[n] : texify(filename));
+    draw(graph(x,y), p,myleg ? legends[n] : texify(filename));
   }
 }
 

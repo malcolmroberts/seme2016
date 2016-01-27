@@ -3,6 +3,7 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import os
 import getopt
 from utils import * 
 
@@ -11,17 +12,20 @@ def main(argv):
     outdir = 'testout'
     t0skip = 1
     groupskip = 1
+    writesuccess = False
     
     usage = '''
     ./test.py 
        -f <input filename>    : input filename
        -d <output directory>  : output dir
+       -t <bool>  : print success per group or no.
        -s <int>  : do every <int> t0s
        -S <int>  : do every <int> flight groups
+       -w <0 or 1> : write success (and pt0) for each group and t0.
     '''
 
     try:
-        opts, args = getopt.getopt(argv,"f:d:s:S:h")
+        opts, args = getopt.getopt(argv,"f:d:s:S:w:h")
     except getopt.GetoptError:
         print usage
         sys.exit(2)
@@ -37,6 +41,8 @@ def main(argv):
             t0skip = int(arg)
         if opt in ("-S"):
             groupskip = int(arg)
+        if opt in ("-w"):
+            writesuccess = (int(arg) == 1)
     
     #extracting flight information
     volStart = filename[5:8]
@@ -67,19 +73,31 @@ def main(argv):
     ndays = 130
 
     datas = organizedata(dates, nflights, rowdata, ndays)
-
+    
     # algorithm
     def falpha(pt0, T, pdemand):
         if(pdemand >= pt0):
             return 1
         if(T == 0):
             return 0
-        return 1.0 / (1.0 + np.exp(-11 * pdemand / pt0) * 4500 * pt0 / (10.5 * T) )
+        return 1.0 / (1.0 + np.exp(-11 * pdemand / pt0) * \
+                      4500 * pt0 / (10.5 * T) )
 
     # parameters
     maxsavings = 0.35
     npd = 200
 
+    maxdays = ndays - 1
+    
+    # Create the pmin.dat files
+    if(writesuccess):
+        for t0 in range(0, maxdays, t0skip):
+            outdirt0 = outdir + "/t0_" + str(t0)
+            if not os.path.exists(outdirt0):
+                os.makedirs(outdirt0)
+            f = open(outdirt0 + '/pmin.dat', 'w')
+            f.close()
+            
     # for each group of flights
     for idata in range(0, len(datas), groupskip):
         print "date:", dates[idata], "nflights:", nflights[idata]
@@ -88,14 +106,19 @@ def main(argv):
 
         pmin = findminprices(nflights[idata], data, ndays)
 
-        print "Best price of the day for this group of flights:", pmin
+        #print "Best price of the day for this group of flights:", pmin
 
         scoreOfThisGroup = []
         stdOfThisGroup = []
         medianOfThisGroup = []
 
+        if(writesuccess):
+            print "output directory:", outdir
+            if not os.path.exists(outdir):
+                os.makedirs(outdir)
+        
         t0 = 0
-        maxdays = ndays - 1
+
         for t0 in range(0, maxdays, t0skip):
             pt0 = findstartprice(t0, pmin)
             print "t0:", t0, "pt0:", pt0
@@ -113,6 +136,19 @@ def main(argv):
                 for j in range(0, ndays - t0):
                     if(j >= iTgood):
                         success[i][j] = 1
+
+            if(writesuccess):
+                outdirt0 = outdir + "/t0_" + str(t0)
+                fileout = outdirt0 + "/success" + str(idata) + ".dat"
+                print "fileout:", fileout
+                with open(fileout, 'wb') as csvfile:
+                    datawriter = csv.writer(csvfile, delimiter='\t', \
+                                            quotechar='#')
+                    for i in range(0, len(success)):
+                        datawriter.writerow(success[i])
+                fd = open(outdirt0 + '/pmin.dat','a')
+                fd.write(str(pt0) + "\n")
+                fd.close()
 
             for i in range(0, npd + 1):
                 pdemand = pdmin + i * deltapd
