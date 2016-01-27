@@ -18,16 +18,17 @@ def main(argv):
     showColorMaps = False
     
     usage = '''
-    ./test.py 
-       -f <input filename>    : input filename
-       -d <output directory>  : output dir
-       -t <bool>  : print success per group or no.
-       -s <int>  : do every <int> t0s
-       -S <int>  : do every <int> flight groups
-       -w <0 or 1> : write success (and pt0) for each group and t0.
-       -m <0 or 1> : export score image for all groups (one image).
-       -k <median or mean>: in score image use either the mean or the median (ignored if -m=0).
-       -c <0 or 1> : show the color maps for each flight.
+./test.py
+    -f <input filename>    : input filename
+    -d <output directory>  : output dir
+    -t <bool>  : print success per group or no.
+    -s <int>  : do every <int> t0s
+    -S <int>  : do every <int> flight groups
+    -w <0 or 1> : write success (and pt0) for each group and t0.
+    -m <0 or 1> : export score image for all groups (one image).
+    -k <median or mean>: in score image use either the mean or the
+       median (ignored if -m=0).
+    -c <0 or 1> : show the color maps for each flight.
     '''
 
     try:
@@ -212,7 +213,8 @@ def main(argv):
                 plt.contourf(X,Y,alpha,[0,0.2,0.4,0.6,0.8,1])
                 plt.clim(0,1)
 
-                #the corresponding score (1 is good, 0 is ultra bad, 0.5 we could flip a coin instead
+                #the corresponding score (1 is good, 0 is ultra bad,
+                #0.5 we could flip a coin instead
                 plt.subplot(133)
                 plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
                 plt.clim(0,1)
@@ -222,7 +224,8 @@ def main(argv):
 
         if (exportScore):
             if kindOfStat == 'mean' :
-                plt.errorbar(range(0,len(scoreOfThisGroup)),scoreOfThisGroup,stdOfThisGroup)
+                plt.errorbar(range(0,len(scoreOfThisGroup)),\
+                             scoreOfThisGroup,stdOfThisGroup)
             if kindOfStat == 'median' :
                 plt.plot(medianOfThisGroup)
             plt.ylim([0,1])
