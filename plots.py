@@ -34,12 +34,15 @@ def main(argv):
             outdir = arg
         if opt in ("-n"):
             normalize = arg
+        if opt in ("-h"):
+            print usage
+            sys.exit(0)
 
     print "input filename:", filename
 
     print "output directory:", outdir
     if not os.path.exists(outdir):
-        os.makedir(outdir)
+        os.makedirs(outdir)
 
     print "normalization choice:", normalize
     if(normalize != "none" and normalize != "mean"):
