@@ -45,6 +45,7 @@ def main(argv):
     kindOfStat = 'median'
     showColorMaps = False
     domeansuccess = False
+    subalpha = True
     
     # parameters
     maxsavings = 0.35
@@ -59,13 +60,14 @@ def main(argv):
     -w <0 or 1> : write success (and pt0) for each group and t0.
     -m <0 or 1> : export score image for all groups (one image).
     -M <0 or 1> : compute mean success (one image).
+    -a <0 or 1> : Subtract alpha from mean success?
     -k <median or mean>: in score image use either the mean or the
        median (ignored if -m=0).
     -c <0 or 1> : show the color maps for each flight.
     '''
 
     try:
-        opts, args = getopt.getopt(argv,"f:d:s:S:w:m:M:k:c:h")
+        opts, args = getopt.getopt(argv,"f:a:d:s:S:w:m:M:k:c:h")
     except getopt.GetoptError:
         print usage
         sys.exit(2)
@@ -87,6 +89,8 @@ def main(argv):
             exportScore = (int(arg) == 1)
         if opt in ("-M"):
             domeansuccess = (int(arg) == 1)
+        if opt in ("-a"):
+            subalpha = (int(arg) == 1)
         if opt in ("-k"):
             kindOfStat = arg
         if opt in ("-c"):
@@ -169,6 +173,8 @@ def main(argv):
 
         pmin = findminprices(nflights[idata], data, ndays)
 
+        print "pmin:", pmin
+        
         if exportScore:
             if kindOfStat == 'mean':
                 scoreOfThisGroup = []
@@ -223,7 +229,10 @@ def main(argv):
                     alpha[i][j] = falpha(pt0, j, pdemand)
 
             if(domeansuccess):
-                meansuccess[t0index] += success - alpha
+                if(subalpha):
+                    meansuccess[t0index] += success - alpha
+                else:
+                    meansuccess[t0index] += success
 
             deltasavings = maxsavings / npd
 
