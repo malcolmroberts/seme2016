@@ -5,8 +5,18 @@ import matplotlib.pyplot as plt
 
 from utils import * 
 
-filename = 'data/PARRUN_ALL.csv'
-print "Opening file:", filename
+filename = 'data/PARFCO_MON_45.csv'
+
+#extracting flight information
+volStart = filename[5:8]
+volEnd = filename[8:11]
+kind = filename[12:]
+p = kind.find('.csv')
+kind = kind[:p]
+
+flightInfo = 'Flight from: '+volStart+' to '+volEnd
+print flightInfo
+print 'Opening file:', filename
 csvfile =  open(filename, 'rb')
 csvreader = csv.reader(csvfile, delimiter=',')
 
@@ -144,9 +154,15 @@ for idata in range(0, len(datas)):
         # plt.colorbar()
         
         # plt.show()
-    plt.plot(medianOfThisGroup)
 
-    plt.errorbar(range(0,len(scoreOfThisGroup)),scoreOfThisGroup,stdOfThisGroup)
+
+
+
+    plt.plot(medianOfThisGroup)
+#    plt.errorbar(range(0,len(scoreOfThisGroup)),scoreOfThisGroup,stdOfThisGroup)
     plt.ylim([0,1])
-    plt.show()
+#    plt.show()
     idata += 1
+myTitle=flightInfo +' '+' '+ kind+'. Score'
+plt.title(myTitle)
+plt.show()
