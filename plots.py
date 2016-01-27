@@ -4,29 +4,49 @@ import csv
 import numpy as np
 import sys
 import getopt
+import os
 
 from utils import * 
 
 def main(argv):
     
     filename = 'data/PARRUN_ALL.csv'
+    outdir = 'out'
+    normalize = 'none'
     ndays = 130
     
     usage = '''
-    ./plots.py -f <filename>
+    ./plots.py 
+       -f <input filename>   : input filename
+       -d <output directory> : output directory
+       -n <none, mean, pt0>  : normalization choice
     '''
     
     try:
-        opts, args = getopt.getopt(argv,"f:")
+        opts, args = getopt.getopt(argv,"f:d:n:h")
     except getopt.GetoptError:
         print usage
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-f"):
             filename = arg
+        if opt in ("-d"):
+            outdir = arg
+        if opt in ("-n"):
+            normalize = arg
 
-    print "filename:", filename
+    print "input filename:", filename
 
+    print "output directory:", outdir
+    if not os.path.exists(outdir):
+        os.makedir(outdir)
+
+    print "normalization choice:", normalize
+    if(normalize != "none" and normalize != "mean"):
+        print "Invalid choice of normalization."
+        print usage
+        sys.exit(1)
+        
     csvfile =  open(filename, 'rb')
     csvreader = csv.reader(csvfile, delimiter=',')
 
@@ -52,13 +72,14 @@ def main(argv):
                 meancount += 1
         meanpmin /= meancount
 
-        pmin /= meanpmin
+        if(normalize == "mean"):
+            pmin /= meanpmin
 
         output = []
         for i in range(0, len(pmin)):
             if pmin[i] != float("inf"):
                 output.append([i, pmin[i]])
-        fileout = "out" + str(idata) + ".dat"
+        fileout = outdir + "/out" + str(idata) + ".dat"
         with open(fileout, 'wb') as csvfile:
             datawriter = csv.writer(csvfile, delimiter='\t', quotechar='#')
             for i in range(0, len(output)):
@@ -67,7 +88,7 @@ def main(argv):
     #    for idata in range(0, len(datas)):
     string = ""
     for idata in range(0, len(datas)):
-         string += "out" + str(idata) + ".dat,"
+         string += outdir + "/out" + str(idata) + ".dat,"
     print string
          
 # The main program is called from here
