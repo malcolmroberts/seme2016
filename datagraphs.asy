@@ -3,6 +3,8 @@ import utils;
 
 //asy datagraphs -u "xlabel=\"\$\\bm{u}\cdot\\bm{B}/uB$\"" -u "doyticks=false" -u "ylabel=\"\"" -u "legendlist=\"a,b\""
 
+// -u "ymax=2"
+
 texpreamble("\usepackage{bm}");
 
 size(400,300,IgnoreAspect);
@@ -11,7 +13,7 @@ scale(Linear,Linear);
 
 bool dolegend=false;
 
-real ymax = 2.0;
+real ymax = 0.0;
 
 string filenames=getstring("filenames");
 string filename;
@@ -46,8 +48,10 @@ while(flag) {
     pen p=Pen(n);
     if(n == 1) p += dashed;
     if(n == 2) p = darkgreen + Dotted;
-    //draw(graph(x,y,y < ymax), p,myleg ? legends[n] : texify(filename));
-    draw(graph(x,y), p,myleg ? legends[n] : texify(filename));
+    if(ymax > 0)
+      draw(graph(x,y,y < ymax), p,myleg ? legends[n] : texify(filename));
+    else
+      draw(graph(x,y), p,myleg ? legends[n] : texify(filename));
   }
 }
 
