@@ -22,8 +22,8 @@ int lastpos;
 
 bool doxticks=true;
 bool doyticks=true;
-string xlabel="$x$";
-string ylabel="$y$";
+string xlabel="Day";
+string ylabel="Price";
 
 usersetting();
 bool myleg=((legendlist == "") ? false: true);
