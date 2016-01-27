@@ -13,6 +13,8 @@ def main(argv):
     t0skip = 1
     groupskip = 1
     writesuccess = False
+    exportScore = False
+    kindOfStat = 'median'
     
     usage = '''
     ./test.py 
@@ -22,10 +24,12 @@ def main(argv):
        -s <int>  : do every <int> t0s
        -S <int>  : do every <int> flight groups
        -w <0 or 1> : write success (and pt0) for each group and t0.
+       -m <0 or 1> : export score image for all groups (one image).
+       -k <median or mean>: in score image use either the mean or the median (ignored if -m=0).
     '''
 
     try:
-        opts, args = getopt.getopt(argv,"f:d:s:S:w:h")
+        opts, args = getopt.getopt(argv,"f:d:s:S:w:m:k:h")
     except getopt.GetoptError:
         print usage
         sys.exit(2)
@@ -43,6 +47,14 @@ def main(argv):
             groupskip = int(arg)
         if opt in ("-w"):
             writesuccess = (int(arg) == 1)
+        if opt in ("-m"):
+            exportScore = (int(arg) == 1)
+        if opt in ("-k"):
+            kindOfStat = arg
+            if kindOfStat != 'mean':
+                if kindOfStat != 'median':
+                    print usage
+                    sys.exit(2)
     
     #extracting flight information
     volStart = filename[5:8]
@@ -106,13 +118,14 @@ def main(argv):
 
         pmin = findminprices(nflights[idata], data, ndays)
 
-        #print "Best price of the day for this group of flights:", pmin
+        if exportScore:
+            if kindOfStat == 'mean':
+                scoreOfThisGroup = []
+                stdOfThisGroup = []
+            elif kindOfStat == 'median':
+                medianOfThisGroup = []
 
-        scoreOfThisGroup = []
-        stdOfThisGroup = []
-        medianOfThisGroup = []
-
-        if(writesuccess):
+        if writesuccess:
             print "output directory:", outdir
             if not os.path.exists(outdir):
                 os.makedirs(outdir)
@@ -160,15 +173,15 @@ def main(argv):
             difference = success - alpha
             score = 1 - abs(difference)
 
-            meanOfScore = np.mean(score)
-            stdOfScore = np.std(score)
-            scoreOfThisGroup.append(meanOfScore)
-            stdOfThisGroup.append(stdOfScore)
-
-            medianOfScore = np.median(score)
-            medianOfThisGroup.append(medianOfScore)
-            #stdOfThisGroup.append(stdOfScore)
-
+            if exportScore:
+                if kindOfStat == 'mean' :
+                    meanOfScore = np.mean(score)
+                    stdOfScore = np.std(score)
+                    scoreOfThisGroup.append(meanOfScore)
+                    stdOfThisGroup.append(stdOfScore)
+                elif kindOfStat == 'median':
+                    medianOfScore = np.median(score)
+                    medianOfThisGroup.append(medianOfScore)
             # i = 0
             # while i <= npd:
             #     y.append((1 - maxsavings) + i * deltasavings)
@@ -194,16 +207,17 @@ def main(argv):
 
             # plt.show()
 
-        plt.plot(medianOfThisGroup)
-    #    plt.errorbar(range(0,len(scoreOfThisGroup)),scoreOfThisGroup,stdOfThisGroup)
-        plt.ylim([0,1])
-    #    plt.show()
-
-    myTitle = flightInfo +' '+' '+ kind+'. Score'
-    plt.title(myTitle)
-    plt.savefig(outdir+'/Score'+volStart+volEnd+'_'+kind)
-    #plt.show()
-
+        if (exportScore):
+            if kindOfStat == 'mean' :
+                plt.errorbar(range(0,len(scoreOfThisGroup)),scoreOfThisGroup,stdOfThisGroup)
+            if kindOfStat == 'median' :
+                plt.plot(medianOfThisGroup)
+            plt.ylim([0,1])
+    if (exportScore):
+        plt.title(flightInfo +' '+' '+ kind+'. Score')
+        plt.savefig(outdir+'/Score'+volStart+volEnd+'_'+kind)
+        plt.show()
+        
 # The main program is called from here
 if __name__ == "__main__":
     main(sys.argv[1:])
