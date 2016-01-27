@@ -60,16 +60,13 @@ def main(argv):
                     sys.exit(2)
         if opt in ("-c"):
             showColorMaps = (int(arg) == 1)
-            if showColorMaps:
-                if exportScore:
-                    print ''' 
-    The options exportScore and showColorMaps are not compatible!
-    Use only one of the two!
-    '''
-                    print usage
-                    sys.exit(2)
-    
-    #extracting flight information
+            
+    if showColorMaps and exportScore:
+        print 'The options exportScore and showColorMaps are not compatible!'
+        print usage
+        sys.exit(2)
+                    
+    # extracting flight information
     volStart = filename[5:8]
     volEnd = filename[8:11]
     kind = filename[12:]
