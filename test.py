@@ -196,7 +196,7 @@ def main(argv):
                     medianOfScore = np.median(score)
                     medianOfThisGroup.append(medianOfScore)
             if showColorMaps:
-                #grid preparation
+                # grid preparation
                 y = []
                 for i in range(0,npd+1):
                     y.append((1 - maxsavings) + i * deltasavings)
@@ -213,8 +213,8 @@ def main(argv):
                 plt.contourf(X,Y,alpha,[0,0.2,0.4,0.6,0.8,1])
                 plt.clim(0,1)
 
-                #the corresponding score (1 is good, 0 is ultra bad,
-                #0.5 we could flip a coin instead
+                # the corresponding score (1 is good, 0 is ultra bad,
+                # 0.5 we could flip a coin instead
                 plt.subplot(133)
                 plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
                 plt.clim(0,1)
