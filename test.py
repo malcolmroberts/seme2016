@@ -92,7 +92,7 @@ def main(argv):
     # Create the pmin.dat files
     if(writesuccess):
         for t0 in range(0, maxdays, t0skip):
-            outdirt0 = outdir + "/" + str(t0)
+            outdirt0 = outdir + "/t0_" + str(t0)
             if not os.path.exists(outdirt0):
                 os.makedirs(outdirt0)
             f = open(outdirt0 + '/pmin.dat', 'w')
@@ -138,6 +138,7 @@ def main(argv):
                         success[i][j] = 1
 
             if(writesuccess):
+                outdirt0 = outdir + "/t0_" + str(t0)
                 fileout = outdirt0 + "/success" + str(idata) + ".dat"
                 print "fileout:", fileout
                 with open(fileout, 'wb') as csvfile:
@@ -146,7 +147,7 @@ def main(argv):
                     for i in range(0, len(success)):
                         datawriter.writerow(success[i])
                 fd = open(outdirt0 + '/pmin.dat','a')
-                fd.write(str(pt0))
+                fd.write(str(pt0) + "\n")
                 fd.close()
 
             for i in range(0, npd + 1):
