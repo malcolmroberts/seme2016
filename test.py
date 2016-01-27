@@ -76,7 +76,7 @@ def main(argv):
     p = kind.find('.csv')
     kind = kind[:p]
 
-    flightInfo = 'Flight from: '+volStart+' to '+volEnd
+    flightInfo = 'Flight from: ' + volStart + ' to ' + volEnd
     print flightInfo
     print 'Opening file:', filename
     csvfile =  open(filename, 'rb')
@@ -224,14 +224,14 @@ def main(argv):
 
         if (exportScore):
             if kindOfStat == 'mean' :
-                plt.errorbar(range(0,len(scoreOfThisGroup)),\
-                             scoreOfThisGroup,stdOfThisGroup)
+                plt.errorbar(range(0, len(scoreOfThisGroup)),\
+                             scoreOfThisGroup, stdOfThisGroup)
             if kindOfStat == 'median' :
                 plt.plot(medianOfThisGroup)
             plt.ylim([0,1])
     if (exportScore):
-        plt.title(flightInfo +' '+' '+ kind+'. Score')
-        plt.savefig(outdir+'/Score'+volStart+volEnd+'_'+kind)
+        plt.title(flightInfo + ' ' + ' ' + kind + '. Score')
+        plt.savefig(outdir + '/Score' + volStart + volEnd + '_' + kind)
         plt.show()
         
 # The main program is called from here
