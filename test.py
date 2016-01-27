@@ -15,6 +15,7 @@ def main(argv):
     writesuccess = False
     exportScore = False
     kindOfStat = 'median'
+    showColorMaps = False
     
     usage = '''
     ./test.py 
@@ -26,10 +27,11 @@ def main(argv):
        -w <0 or 1> : write success (and pt0) for each group and t0.
        -m <0 or 1> : export score image for all groups (one image).
        -k <median or mean>: in score image use either the mean or the median (ignored if -m=0).
+       -c <0 or 1> : show the color maps for each flight.
     '''
 
     try:
-        opts, args = getopt.getopt(argv,"f:d:s:S:w:m:k:h")
+        opts, args = getopt.getopt(argv,"f:d:s:S:w:m:k:c:h")
     except getopt.GetoptError:
         print usage
         sys.exit(2)
@@ -53,6 +55,16 @@ def main(argv):
             kindOfStat = arg
             if kindOfStat != 'mean':
                 if kindOfStat != 'median':
+                    print usage
+                    sys.exit(2)
+        if opt in ("-c"):
+            showColorMaps = (int(arg) == 1)
+            if showColorMaps:
+                if exportScore:
+                    print ''' 
+    The options exportScore and showColorMaps are not compatible!
+    Use only one of the two!
+    '''
                     print usage
                     sys.exit(2)
     
@@ -182,30 +194,31 @@ def main(argv):
                 elif kindOfStat == 'median':
                     medianOfScore = np.median(score)
                     medianOfThisGroup.append(medianOfScore)
-            # i = 0
-            # while i <= npd:
-            #     y.append((1 - maxsavings) + i * deltasavings)
-            #     i += 1
+            if showColorMaps:
+                #grid preparation
+                y = []
+                for i in range(0,npd+1):
+                    y.append((1 - maxsavings) + i * deltasavings)
+                x = range(0, ndays-t0)
+                X,Y = np.meshgrid(x,y)
 
-            # x = range(0, ndays-t0)
-            # y = []
-            # X,Y = np.meshgrid(x,y)
-            # plt.subplot(131)
-            # plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
-            # plt.clim(0,1)
-            # plt.colorbar()
+                # the truth
+                plt.subplot(131)
+                plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
+                plt.clim(0,1)
 
-            # plt.subplot(132)
-            # plt.contourf(X,Y,alpha,[0,0.2,0.4,0.6,0.8,1])
-            # plt.clim(0,1)
-            # plt.colorbar()
+                # our estimates
+                plt.subplot(132)
+                plt.contourf(X,Y,alpha,[0,0.2,0.4,0.6,0.8,1])
+                plt.clim(0,1)
 
-            # plt.subplot(133)
-            # plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
-            # plt.clim(0,1)
-            # plt.colorbar()
+                #the corresponding score (1 is good, 0 is ultra bad, 0.5 we could flip a coin instead
+                plt.subplot(133)
+                plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
+                plt.clim(0,1)
 
-            # plt.show()
+                plt.colorbar()
+                plt.show()
 
         if (exportScore):
             if kindOfStat == 'mean' :
