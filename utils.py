@@ -55,3 +55,35 @@ def testpdemand(pmin, pdemand):
         if(pmin[i] <= pdemand):
             return i
     return len(pmin) + 1
+
+def findminprices(nflights, data, ndays):
+    pmin = np.zeros((ndays))
+    # initialization of pmin to inf
+    for i in range(0, len(pmin)):
+        pmin[i] = float("inf")
+    # We compute the minimum price for each day: the current price p(t)
+    for i in range(0, nflights):
+        for j in range(0, ndays):
+            price = data[i][j]
+            if(price != -1):
+                if(price < pmin[j]):
+                    pmin[j] = price
+    return pmin
+
+def findstartprice(t0, pmin):
+    t00 = t0
+    pt0 = 0
+    # identifying the current price: skipping the "inf" first to
+    # the past than to the future!
+    if pmin[t0] != float("inf"):
+        pt0 = pmin[t0]
+    while pt0 == 0 and t00 >= 0:
+        if(pmin[t00] != float("inf")):
+            pt0 = pmin[t00]
+        else:
+            t00 -= 1
+    while pt0 == 0:
+        if(pmin[t00] != float("inf")):
+            pt0 = pmin[t00]
+        t00 += 1
+    return pt0
