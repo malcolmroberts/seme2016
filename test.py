@@ -8,14 +8,20 @@ from utils import *
 
 def main(argv):
     filename = 'data/PARFCO_MON_45.csv'
+    outdir = 'testout'
+    t0skip = 1
+    groupskip = 1
     
     usage = '''
     ./test.py 
-       -f <input filename>   : input filename
+       -f <input filename>    : input filename
+       -d <output directory>  : output dir
+       -s <int>  : do every <int> t0s
+       -S <int>  : do every <int> flight groups
     '''
 
     try:
-        opts, args = getopt.getopt(argv,"f:h")
+        opts, args = getopt.getopt(argv,"f:d:s:S:h")
     except getopt.GetoptError:
         print usage
         sys.exit(2)
@@ -25,6 +31,12 @@ def main(argv):
             sys.exit(0)
         if opt in ("-f"):
             filename = arg
+        if opt in ("-d"):
+            outdir = arg
+        if opt in ("-s"):
+            t0skip = int(arg)
+        if opt in ("-S"):
+            groupskip = int(arg)
     
     #extracting flight information
     volStart = filename[5:8]
@@ -69,7 +81,7 @@ def main(argv):
     npd = 200
 
     # for each group of flights
-    for idata in range(0, len(datas), 10):
+    for idata in range(0, len(datas), groupskip):
         print "date:", dates[idata], "nflights:", nflights[idata]
 
         data = datas[idata]
@@ -84,7 +96,7 @@ def main(argv):
 
         t0 = 0
         maxdays = ndays - 1
-        for t0 in range(0, maxdays, 10):
+        for t0 in range(0, maxdays, t0skip):
             pt0 = findstartprice(t0, pmin)
             print "t0:", t0, "pt0:", pt0
 
@@ -150,8 +162,8 @@ def main(argv):
     #    plt.errorbar(range(0,len(scoreOfThisGroup)),scoreOfThisGroup,stdOfThisGroup)
         plt.ylim([0,1])
     #    plt.show()
-        idata += 1
-    myTitle=flightInfo +' '+' '+ kind+'. Score'
+
+    myTitle = flightInfo +' '+' '+ kind+'. Score'
     plt.title(myTitle)
     plt.show()
 
