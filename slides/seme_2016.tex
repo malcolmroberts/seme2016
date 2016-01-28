@@ -337,6 +337,171 @@
   \vspace{-0.4cm}
 }
 
+%% FIXME: Put tsuff here
+
+
+ \frame{
+ \frametitle{Calibration of the model }
+ \begin{itemize} 
+ \item Quadratic cost between the model and the observed data for a given rout $t_0$ 
+ $$ J_{t_0} (a,b) = \dfrac{1}{2} \sum_{T} \sum_{P_d} \left( \alpha(a,b,T,P_d,p(t_0)) - V(T,P_d,p(t_0)) \right)^2 $$
+ 
+ \item For every rout $t_0 \in (0,t_{max}]$, we would like to minimize the cost $ \argmin_{(a,b) \in \R^*_+}   J_{t_0} (a,b) $ using a gradient based algorithm such as BFGS.  
+ 
+ \end{itemize}
+
+
+\begin{columns}
+\begin{column}{6cm}
+\begin{figure}
+\centering
+\includegraphics[width=6cm]{Cost.jpg}
+\caption{$J$ in the region $(a,b) \in [0,200]\times[0,10]$}
+\end{figure}
+\end{column}
+
+
+
+\begin{column}{6cm}
+\begin{figure}
+\centering
+\includegraphics[width=6cm]{zoom_cost.jpg}
+\caption{Zoom of $J$ over a and b}
+\end{figure}
+\end{column}
+\end{columns}
+ }
+ 
+ 
+ 
+ 
+ \frame{
+\frametitle{ A few examples of optimal parameters}
+ \begin{figure}[h!]
+ \centering
+$$
+\begin{array}{c|c|c|c|c|}
+t_0 = 0 & 1 flight & 5 flights  & 10 flights & 50 flights \\
+ \hline
+a^*   			&- 	&192				&180		&182 \\
+b^*			&- 	&11				&40		&39,5 \\
+J(428,11) 	&- 	&2\times 10^{4}		&5\times 10^{4}		&2,6\times 10^{5}	 \\
+J(a^*,b^*) 	&- 	&1,7\times 10^4	&1,8\times 10^{3}		&1,8\times 10^{3} \\
+\| \nabla J(a^*,b^*) \|	&-	&10^{-2}		&10^{-3}		&10^{-3} \\
+\end{array}
+$$
+\end{figure}
+
+
+
+ \begin{figure}[h!]
+ \centering
+$$
+\begin{array}{c|c|c|c|c|}
+t_0 = 50 & 1 flight & 5 flights  & 10 flights & 50 flights \\
+ \hline
+a^*   					&140					&140					&140					&140 \\
+b^*					&40 					&39					&40					&42 \\
+J(428,11) 			&7\times  10^{4}	 	&4\times 10^{4}			&3,9\times 10^{4}		&3\times 10^{5}	 \\
+J(a^*,b^*) 			&  1,3\times 10^4   		&1,3\times 10^3		&1,8\times 10^{3}		&1,9\times 10^{3} \\
+\| \nabla J(a^*,b^*) \|	& 10^{-3}				&10^{-4}				&10^{-4}				&10^{-3} \\
+\end{array}
+$$
+\end{figure}
+}
+
+
+ \frame{
+   \frametitle{Possible improvement of the model}
+
+   $$\beta(p_d, p(t_0), p_{min}, T) =  \dfrac{1}{1+ exp(-(\textcolor{blue}{S}-S_0)) + \dfrac{\textcolor{magenta}{d}}{T} +  \dfrac{\textcolor{magenta}{e} \times p_{min}}{max( p(t_0)-p_{min} , 10^{-14})}}$$
+
+
+   \begin{itemize}
+   \item The score S is defined by $\textcolor{blue}{S = \textcolor{magenta}{a} \dfrac{p_d}{p(t_0)} + \textcolor{magenta}{b} (1-  \dfrac{p_{min}}{p(t_0)} ) + \textcolor{magenta}{c} \dfrac{T}{T_f}} $
+   \item $\dfrac{\textcolor{magenta}{c}}{T} $ : penalisation term of short times . 
+   \item $ \dfrac{\textcolor{magenta}{d} \times p_{min}}{max( p(t_0)-p_{min} , 10^{-14})}$ : penalisation term of low prices. 
+   \item $S_0$ : constant. 
+   \end{itemize}
+
+ }
+
+
+\frame{
+  \frametitle{comparaison of the models for the flight PARIS-NEW YORK }
+
+  Form top to bottom and from left to right : the model $\alpha$ , the model $\beta$ with an exact estimation of $p_{min}$, $\beta$ with an over estimation of $p_{min}$and $\beta$ with an under estimation of $p_{min}$
+
+  \begin{columns}
+    \begin{column}{5cm}
+      \begin{figure}
+        \centering
+        \includegraphics[width=5cm]{ScoreImg/ScorePARNYC_SAT_7.png}
+        %\caption{ the model $\alpha$ }
+      \end{figure}
+
+      \vspace{-0.8cm}
+      \begin{figure}
+        \centering
+        \includegraphics[width=5cm]{ScorePRECISE/ScorePARNYC_SAT_7.png}
+        %\caption{ the model $\beta$ with an exact estimation of $p_{min}$}
+      \end{figure}
+    \end{column}
+
+    \begin{column}{5cm}
+      \begin{figure}
+        \centering
+        \includegraphics[width=5cm]{ScoreOVERESTIMATE/ScorePARNYC_SAT_7.png}
+        %\caption{ the model $\beta$ with an over estimation of $p_{min}$}
+      \end{figure}
+      \vspace{-0.8cm}
+      \begin{figure}
+        \centering
+        \includegraphics[width=5cm]{ScoreUNDERESTIMATE/ScorePARNYC_SAT_7.png}
+        %\caption{ the model $\beta$ with an under estimation of $p_{min}$}
+      \end{figure}
+    \end{column}
+  \end{columns}
+}
+
+
+\frame{
+  \frametitle{comparaison of the models for the flight PARIS-ROMA }
+  Form top to bottom and from left to right : the model $\alpha$ , the model $\beta$ with an exact estimation of $p_{min}$, $\beta$ with an over estimation of $p_{min}$and $\beta$ with an under estimation of $p_{min}$
+
+  \begin{columns}
+    \begin{column}{5cm}
+      \begin{figure}
+        \centering
+        \includegraphics[width=5cm]{ScoreImg/ScorePARFCO_SAT_7.png}
+        %\caption{ the model $\alpha$ }
+      \end{figure}
+
+      \vspace{-0.8cm}
+      \begin{figure}
+        \centering
+        \includegraphics[width=5cm]{ScorePRECISE/ScorePARFCO_SAT_7.png}
+        %\caption{ the model $\beta$ with an exact estimation of $p_{min}$}
+      \end{figure}
+    \end{column}
+
+    \begin{column}{5cm}
+      \begin{figure}
+        \centering
+        \includegraphics[width=5cm]{ScoreOVERESTIMATE/ScorePARFCO_SAT_7.png}
+        %\caption{ the model $\beta$ with an over estimation of $p_{min}$}
+      \end{figure}
+      \vspace{-0.8cm}
+      \begin{figure}
+        \centering
+        \includegraphics[width=5cm]{ScoreUNDERESTIMATE/ScorePARFCO_SAT_7.png}
+        %\caption{ the model $\beta$ with an under estimation of $p_{min}$}
+      \end{figure}
+    \end{column}
+  \end{columns}
+}
+
+
 \frame{
   Conclusion
   \hspace{0.4cm}
