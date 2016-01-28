@@ -47,6 +47,7 @@ def main(argv):
     domeansuccess = False
     subalpha = True
     verbose = False
+    alpha = 0
     
     # parameters
     maxsavings = 0.35
@@ -65,11 +66,12 @@ def main(argv):
     -k <median or mean>: in score image use either the mean or the
        median (ignored if -m=0).
     -c <0 or 1> : show the color maps for each flight.
+    -A <0 or 1> : 0: OptionWay's alpha.  1: our alpha.
     -v : verbose output
     '''
 
     try:
-        opts, args = getopt.getopt(argv,"f:a:d:s:S:w:m:M:k:c:hv")
+        opts, args = getopt.getopt(argv,"f:a:d:s:S:w:m:M:k:c:hvA:")
     except getopt.GetoptError:
         print usage
         sys.exit(2)
@@ -99,6 +101,9 @@ def main(argv):
             showColorMaps = (int(arg) == 1)
         if opt in ("-v"):
             verbose = True
+        if opt in ("-A"):
+            alphachoice = int(arg)
+
             
     if showColorMaps and exportScore:
         print 'The options exportScore and showColorMaps are not compatible!'
@@ -250,8 +255,10 @@ def main(argv):
             for i in range(0, npd + 1):
                 pdemand = pdmin + i * deltapd
                 for j in range(0, ndays - t0):
-                    #alpha[i][j] = falpha(pt0, j, pdemand)
-                    alpha[i][j] = falphaWithMin(pt0, j, pdemand,minPrice)
+                    if(alphachoice == 0):
+                        alpha[i][j] = falpha(pt0, j, pdemand)
+                    if(alphachoice == 1):
+                        alpha[i][j] = falphaWithMin(pt0, j, pdemand,minPrice)
 
             if(domeansuccess):
                 if(subalpha):
