@@ -163,10 +163,10 @@ def main(argv):
         beta=8
         gamma=12
         delta=7
-        theta=10 #Warning: this one is in days
+        theta=7 #Warning: this one is in days
         S=beta*pdemand/pt0+gamma*(1-minPrice/pt0)+delta*T/Tf
         S0=10
-        theta2=0.002
+        theta2=0.01
         return 1.0 / (1.0+np.exp( -(S-S0) ) + theta/(T+0.00001) + theta2*minPrice/( max(pdemand-minPrice,0.000001) ) )
 
     maxdays = ndays - 1
@@ -187,18 +187,22 @@ def main(argv):
     meansuccesscount = 0
 
     # for each group of flights
+    globalMinForThisRoute = 1e9
+    for idata in range(0, len(datas)):
+        pmin = findminprices(nflights[idata], datas[idata], ndays)
+        minPrice = min(pmin)
+        globalMinForThisRoute = min(minPrice,globalMinForThisRoute)
+    
+    # for each group of flights
     for idata in range(0, len(datas), groupskip):
         print "date:", dates[idata], "nflights:", nflights[idata], \
-            "\t", idata, "/", (len(datas) / groupskip)
+            "\t", idata/groupskip, "/", (len(datas) / groupskip)
 
         meansuccesscount += 1
         
         data = datas[idata]
-
-        pmin = findminprices(nflights[idata], data, ndays)
-
+        pmin = findminprices(nflights[idata], datas[idata], ndays)
         minPrice = min(pmin)
-        
         if exportScore:
             if kindOfStat == 'mean':
                 scoreOfThisGroup = []
@@ -287,8 +291,7 @@ def main(argv):
                              scoreOfThisGroup, stdOfThisGroup)
             if kindOfStat == 'median' :
                 plt.plot(medianOfThisGroup)
-            plt.ylim([0,1])
-
+            plt.ylim([-0.1,1.1])
     if (exportScore):
         plt.title(flightInfo + ' ' + ' ' + kind + '. Score')
         plt.savefig(outdir + '/Score' + volStart + volEnd + '_' + kind)
