@@ -289,12 +289,12 @@ def main(argv):
                                         quotechar='#')
                 for j in range(0, len(meansuccess[i])):
                     datawriter.writerow(meansuccess[i][j])
+        print (outdir + "/normvst0.dat")
         with open(outdir + "/normvst0.dat", 'wb') as csvfile:
             datawriter = csv.writer(csvfile, delimiter='\t', \
                                     quotechar='#')
             for i in range(0, len(errors)):
                 datawriter.writerow(errors[i])
-                print errors[i]
 
                     
     print "Finished processing", filename, "Output in:", outdir
