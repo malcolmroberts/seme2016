@@ -104,8 +104,20 @@ def main(argv):
             return 1
         if(T == 0):
             return 0
-        return 1.0 / (1.0 + np.exp(-11 * pdemand / pt0) * \
-                      4500 * pt0 / (10.5 * T) )
+        b=11
+        a=4500/10.5
+        return 1.0 / (1.0+ np.exp(-b * pdemand / pt0) * a * pt0 / T )
+
+    def falphaWithMin(pt0, T, pdemand,minPrice):
+        Tf=130
+        beta=8
+        gamma=12
+        delta=7
+        theta=10 #Warning: this one is in days
+        S=beta*pdemand/pt0+gamma*(1-minPrice/pt0)+delta*T/Tf
+        S0=10
+        theta2=0.002
+        return 1.0 / (1.0+np.exp( -(S-S0) ) + theta/(T+0.00001) + theta2*minPrice/( max(pdemand-minPrice,0.000001) ) )
 
     # parameters
     maxsavings = 0.35
@@ -130,6 +142,8 @@ def main(argv):
 
         pmin = findminprices(nflights[idata], data, ndays)
 
+        minPrice = min(pmin)
+        
         if exportScore:
             if kindOfStat == 'mean':
                 scoreOfThisGroup = []
@@ -178,7 +192,8 @@ def main(argv):
             for i in range(0, npd + 1):
                 pdemand = pdmin + i * deltapd
                 for j in range(0, ndays - t0):
-                    alpha[i][j] = falpha(pt0, j, pdemand)
+                    #alpha[i][j] = falpha(pt0, j, pdemand)
+                    alpha[i][j] = falphaWithMin(pt0, j, pdemand,minPrice)
 
             deltasavings = maxsavings / npd
 
