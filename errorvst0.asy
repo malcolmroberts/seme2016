@@ -48,10 +48,15 @@ while(flag) {
     pen p=Pen(n);
     if(n == 1) p += dashed;
     if(n == 2) p = darkgreen + Dotted;
+    
+    string tfilename = texify(filename);
+    tfilename = substr(tfilename,5);
+    tfilename = substr(tfilename,0,length(tfilename) - 13);
+    
     if(ymax > 0)
-      draw(graph(x,y,y < ymax), p,myleg ? legends[n] : texify(filename));
+      draw(graph(x,y,y < ymax), p,myleg ? legends[n] : tfilename);
     else
-      draw(graph(x,y), p,myleg ? legends[n] : texify(filename));
+      draw(graph(x,y), p,myleg ? legends[n] : tfilename);
   }
 }
 

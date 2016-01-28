@@ -1,4 +1,4 @@
-\documentclass[8pt]{beamer}
+\documentclass[10pt]{beamer}
 
 %\beamertemplateshadingbackground{gray!0}{gray!50}
 %\usepackage{beamerthemeshadow}
@@ -92,8 +92,8 @@
 % pour avoir le texte caché en gris
 % \beamertemplatetransparentcovereddynamic
 
-\title{Reliability of an option estimator on flight tickets}
-
+\title{Reliability of an option estimator for flight tickets}
+\author{Malcolm Roberts, etc.} %FIXME
 
 \begin{document}
 
@@ -105,7 +105,7 @@
   The customer enters a set of criteria for its flight. In this work,
   only the following are considered
   \begin{itemize}
-  \item the route (= (Paris - NYC,  2014-07-24, 2014-08-10)) 
+  \item the route (eg Paris - NYC,  2014-07-24, 2014-08-10)
   \item the start time $t_0$ (for the option),
   \item the demanded price $p_d$ (for the option),
   \item the expiry time $T$ at the option expires (for the option). 
@@ -118,14 +118,14 @@
   p_d\geq p(t^*,t_0,{\rm route}).
   $$
   In that case, the option is terminated and the customer pays its
-  tickets at the demanded price $p_d$. Else he doesn't travel!
+  tickets at the demanded price $p_d$. Otherwise he doesn't travel!
 }
 
 \subsection{The goal of the estimator} 
 \frame{ 
   \begin{itemize}
-  \item When $(t_0,T,p_d)$ and the route are given, \textit{OPTION
-    WAY} evaluates the possibility to terminate the option before time
+  \item When $(t_0,T,p_d)$ and the route are given, Option Way
+    evaluates the possibility to terminate the option before time
     $t_0+T$ by returning a percentage
     $$
     \alpha(t_0,T, p_d, {\rm route})\in [0,1].
@@ -139,18 +139,21 @@
 
 \subsection{Examples of data} 
 \frame{ 
-  Paris-Rome, one week travel. Departure on saturday.
-  \vspace{-0.4cm}
   \begin{center}
-    \includegraphics[width=7.cm]{picture1.png}
+    Paris-Rome, one week travel, departing Saturday. Minmum price.
+  \end{center}
+    
+  \begin{center}
+    \includegraphics[width=0.9\textwidth]{../pdf/PARFCO_SAT_7_nonorm}
   \end{center}
   \vspace{-0.4cm}
 }
-\frame{ 
-  Paris-La R\'eunion, one week travel. Departure on saturday.
-  \vspace{-0.4cm}
+\frame{
   \begin{center}
-    \includegraphics[width=7.cm]{picture2.png}
+    Paris-La R\'eunion, one week travel, departing Saturday. Minmum price.
+  \end{center}
+  \begin{center}
+    \includegraphics[width=0.9\textwidth]{../pdf/PARRUN_SAT_7_nonorm}
   \end{center}
   \vspace{-0.4cm}
 }
@@ -159,14 +162,14 @@
 \subsection{Explanation of the test}
 \frame{
   \textbf{Explanation:} we want to test the prediction of the
-  relevance of the option given by OPTION WAY. \\
+  relevance of the option given by Option Way. \\
   Example: 
   \begin{itemize} 
   \item My travel lasts $20$ days and the departure in on Monday in
     two months.
   \item I demand a price $p_d$ for this specific flight.  
   \end{itemize}
-  I enter information on the OPTION WAY website and I demand a one
+  I enter information on the Option Way website and I demand a one
   month option (one month = time limit) at price $p_d$. \\
   \begin{figure}
     \begin{center}
@@ -175,8 +178,7 @@
 
         \draw[->] (0,0)--(8,0);
 
-
-        \draw (0,0) node[vertex,label=below:{$0={\rm actual \ time}$}] (v) {};
+        \draw (0,0) node[vertex,label=below:{$0={\rm now}$}] (v) {};
         \draw (3.5,0) node[vertex,label=below:{$1={\rm option \ time \ limit}$}] (v) {};
         \draw (7,0) node[vertex,label=below:{$2={\rm departure }$}] (v) {};
       \end{tikzpicture}
@@ -185,11 +187,11 @@
     \end{center}
   \end{figure}
 } \frame{
-  $\to$ The OPTION WAY website returns a percentage $\red \alpha$ for
-  the relevance of my option : what is the "probability" to find the
-  flight ticket at price $p_d$ before this time limit ? It is $\red
+  $\to$ The Optin Way website returns a probability $\red \alpha$ for
+  the relevance of my option: what is the "probability" to find the
+  flight ticket at price $p_d$ before this time limit? It is $\red
   \alpha$. \\
-  \textbf{Our question : is $\red \alpha$ a good estimator ?}
+  \textbf{Our question: is $\red \alpha$ a good estimator ?}
   We design these simple tests :
   \begin{enumerate}
   \item sample a collection of $\alpha(t_0,T,p_d, {\rm route})$ for
@@ -211,23 +213,25 @@
     pessimistic. If it is negative, $\alpha$ is optimistic.
   \item $Test_2:=1-\vert Test_1\vert \in [0,1]$ is the distance to the
     truth. The more it is closed to $1$, the better is the prediction
-    $\alpha$ given by OPTION WAY.
+    $\alpha$ given by Option Way.
   \end{itemize}
   With these $Test_1$ and $Test_2$ we can build some graphic
   representations to be able to compare $\alpha$ with the truth$V$. \\
 
 }
+
 \subsection{Expression of $\alpha$}
 \frame{
-  Expression of $\alpha$ chosen by OPTION WAY
+  Expression of $\alpha$ chosen by Option Way
   $$
-  \alpha(t_0,T,p_d)=1/(1+\frac{4500p(t_0)}{10,5\times T}e^{-11\frac{p_d}{p(t_0)}}).
+  \alpha(t_0,T,p_d)=1/\left(1+\frac{4500p(t_0)}{10,5\times T}
+  e^{-11\frac{p_d}{p(t_0)}}\right).
   $$
   $\to$ It is independent of the route, the past prices...\\
   This has the shape of a sigmoid ($f(x)=1/(1+e^{-x})$)
   \hspace{0.4cm}
   \begin{center}
-    \includegraphics[width=4.cm]{sigmoid.png}
+    \includegraphics[width=6cm]{sigmoid.png}
   \end{center}
   \vspace{-0.4cm}
 }
@@ -279,31 +283,33 @@
     trip but not the departure time.  We fix $t_0$. We look at the
     matrix
     $$
-    M_1: \ (T,p_d) \mapsto \sum \limits_{ {\rm departure \ day} } V(t_0, T, p_d, {\rm route}) / \sum \limits_{ {\rm departure \ day} } 1.
+    M_1: \ (T,p_d) \mapsto \sum \limits_{ {\rm departure \ day} } V(t_0, T, p_d, {\rm route}) \bigg/ \sum \limits_{ {\rm departure \ day} } 1.
     $$
   \item and aslo
     $$
-    M_2: \ (T,p_d) \mapsto \sum \limits_{ {\rm departure \ day} } [V-\alpha](t_0, T, p_d, {\rm route}) / \sum \limits_{ {\rm departure \ day} } 1.
+    M_2: \ (T,p_d) \mapsto \sum \limits_{ {\rm departure \ day} } [V-\alpha](t_0, T, p_d, {\rm route}) \bigg/ \sum \limits_{ {\rm departure \ day} } 1.
     $$
  \end{itemize}
 }
 
 \frame{
-  Results (1): $M_1$ for $t_0=20$ (normalised). The flight is
-  Paris-Madrid, Monday 123 days.
-  \hspace{0.4cm}
+  \frametitle{Results (1)}
+
+  $M_1$ for $t_0=20$. The flight is Paris-Madrid, Monday 123 days.
+
   \begin{center}
-    \includegraphics[width=8.cm]{res4.pdf}
+    \includegraphics[width=0.8\textwidth]{res4.pdf}
   \end{center}
   \vspace{-0.4cm}
 }
 
 \frame{
-  Results (2): $M_2$ for $t_0=20$ (normalised). The flight is
-  Paris-Madrid, Monday 123 days.
-  \hspace{0.4cm}
+  \frametitle{Results (2)}
+
+  $M_2$ for $t_0=20$. The flight is Paris-Madrid, Monday 123 days.
+  
   \begin{center}
-    \includegraphics[width=8.cm]{res5.pdf}
+    \includegraphics[width=0.8\textwidth]{res5.pdf}
   \end{center}
   \vspace{-0.4cm}
 }
@@ -318,26 +324,21 @@
 }
 
 \frame{
-  Results (3):
+  \frametitle{Results (3)}
   \hspace{0.4cm}
   \begin{center}
-    \includegraphics[width=10.cm]{res6.png}
+    \includegraphics[width=\textwidth]{../pdf/errorvst0}
   \end{center}
   \vspace{-0.4cm}
 }
 
-%% FIXME: Put tsuff here
-
-
  \frame{
  \frametitle{Calibration of the model }
  \begin{itemize} 
- \item Quadratic cost between the model and the observed data for a given rout $t_0$ 
+ \item \small{Quadratic cost between the model and the observed data for a given route $t_0$ 
  $$ J_{t_0} (a,b) = \dfrac{1}{2} \sum_{T} \sum_{P_d} \left( \alpha(a,b,T,P_d,p(t_0)) - V(T,P_d,p(t_0)) \right)^2 $$
- 
- \item For every rout $t_0 \in (0,t_{max}]$, we would like to minimize the cost $ argmin_{(a,b) \in \R^*_+}   J_{t_0} (a,b) $ using a gradient based algorithm such as BFGS.  
-%FIXME: argmin
- 
+ }
+ \item For every route $t_0 \in (0,t_{max}]$, we would like to minimize the cost $ argmin_{(a,b) \in \R^*_+}   J_{t_0} (a,b) $ using a gradient based algorithm such as BFGS.  
  \end{itemize}
 
 
@@ -418,36 +419,36 @@ $$
 
 
 \frame{
-  \frametitle{comparaison of the models for the flight PARIS-NEW YORK }
+  \frametitle{Comparison of the models for the flight PARIS-NEW YORK }
 
-  Form top to bottom and from left to right : the model $\alpha$ , the model $\beta$ with an exact estimation of $p_{min}$, $\beta$ with an over estimation of $p_{min}$and $\beta$ with an under estimation of $p_{min}$
+\small{Form top to bottom and from left to right : the model $\alpha$ , the model $\beta$ with an exact estimation of $p_{min}$, $\beta$ with an over estimation of $p_{min}$and $\beta$ with an under estimation of $p_{min}$}
 
   \begin{columns}
-    \begin{column}{5cm}
+    \begin{column}{4.5cm}
       \begin{figure}
         \centering
-        \includegraphics[width=5cm]{../ScoreImg/ScorePARNYC_SAT_7.png}
+        \includegraphics[width=4.5cm]{../ScoreImg/ScorePARNYC_SAT_7.png}
         %\caption{ the model $\alpha$ }
       \end{figure}
 
       \vspace{-0.8cm}
       \begin{figure}
         \centering
-        \includegraphics[width=5cm]{../ScorePRECISE/ScorePARNYC_SAT_7.png}
+        \includegraphics[width=4.5cm]{../ScorePRECISE/ScorePARNYC_SAT_7.png}
         %\caption{ the model $\beta$ with an exact estimation of $p_{min}$}
       \end{figure}
     \end{column}
 
-    \begin{column}{5cm}
+    \begin{column}{4.5cm}
       \begin{figure}
         \centering
-        \includegraphics[width=5cm]{../ScoreOVERESTIMATE/ScorePARNYC_SAT_7.png}
+        \includegraphics[width=4.5cm]{../ScoreOVERESTIMATE/ScorePARNYC_SAT_7.png}
         %\caption{ the model $\beta$ with an over estimation of $p_{min}$}
       \end{figure}
       \vspace{-0.8cm}
       \begin{figure}
         \centering
-        \includegraphics[width=5cm]{../ScoreUNDERESTIMATE/ScorePARNYC_SAT_7.png}
+        \includegraphics[width=4.5cm]{../ScoreUNDERESTIMATE/ScorePARNYC_SAT_7.png}
         %\caption{ the model $\beta$ with an under estimation of $p_{min}$}
       \end{figure}
     \end{column}
@@ -457,34 +458,34 @@ $$
 
 \frame{
   \frametitle{comparaison of the models for the flight PARIS-ROMA }
-  Form top to bottom and from left to right : the model $\alpha$ , the model $\beta$ with an exact estimation of $p_{min}$, $\beta$ with an over estimation of $p_{min}$and $\beta$ with an under estimation of $p_{min}$
+  \small{Form top to bottom and from left to right : the model $\alpha$ , the model $\beta$ with an exact estimation of $p_{min}$, $\beta$ with an over estimation of $p_{min}$and $\beta$ with an under estimation of $p_{min}$}
 
   \begin{columns}
-    \begin{column}{5cm}
+    \begin{column}{4.5cm}
       \begin{figure}
         \centering
-        \includegraphics[width=5cm]{../ScoreImg/ScorePARFCO_SAT_7.png}
+        \includegraphics[width=4.5cm]{../ScoreImg/ScorePARFCO_SAT_7.png}
         %\caption{ the model $\alpha$ }
       \end{figure}
 
       \vspace{-0.8cm}
       \begin{figure}
         \centering
-        \includegraphics[width=5cm]{../ScorePRECISE/ScorePARFCO_SAT_7.png}
+        \includegraphics[width=4.5cm]{../ScorePRECISE/ScorePARFCO_SAT_7.png}
         %\caption{ the model $\beta$ with an exact estimation of $p_{min}$}
       \end{figure}
     \end{column}
 
-    \begin{column}{5cm}
+    \begin{column}{4.5cm}
       \begin{figure}
         \centering
-        \includegraphics[width=5cm]{../ScoreOVERESTIMATE/ScorePARFCO_SAT_7.png}
+        \includegraphics[width=4.5cm]{../ScoreOVERESTIMATE/ScorePARFCO_SAT_7.png}
         %\caption{ the model $\beta$ with an over estimation of $p_{min}$}
       \end{figure}
       \vspace{-0.8cm}
       \begin{figure}
         \centering
-        \includegraphics[width=5cm]{../ScoreUNDERESTIMATE/ScorePARFCO_SAT_7.png}
+        \includegraphics[width=4.5cm]{../ScoreUNDERESTIMATE/ScorePARFCO_SAT_7.png}
         %\caption{ the model $\beta$ with an under estimation of $p_{min}$}
       \end{figure}
     \end{column}
@@ -493,8 +494,8 @@ $$
 
 
 \frame{
-  Conclusion
-  \hspace{0.4cm}
+  \frametitle{Conclusion}
+  
   Primary objective: test algorithms for predicting option success.
   \begin{itemize}
   \item We looked at a score per departure day.
