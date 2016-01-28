@@ -152,7 +152,6 @@ def main(argv):
         return 1.0 / (1.0 + np.exp(-11 * pdemand / pt0) * \
                       4500 * pt0 / (10.5 * T) )
 
-
     maxdays = ndays - 1
 
     # Create the pmin.dat files
@@ -276,9 +275,12 @@ def main(argv):
         plt.show()
         
     if(domeansuccess):
+        errors = []
         for i in range(0, len(meansuccess)):
             meansuccess[i] /= meansuccesscount
-            outfilei = "meansuccess" + str(i * t0skip) + ".dat"
+            t0 = i * t0skip
+            errors.append([t0, l2norm(meansuccess[i])])
+            outfilei = "meansuccess" + str(t0) + ".dat"
             if not os.path.exists(outdir):
                 os.makedirs(outdir)
             with open(outdir + "/" + outfilei, 'wb') as csvfile:
@@ -286,6 +288,13 @@ def main(argv):
                                         quotechar='#')
                 for j in range(0, len(meansuccess[i])):
                     datawriter.writerow(meansuccess[i][j])
+        with open(outdir + "/normvst0.dat", 'wb') as csvfile:
+            datawriter = csv.writer(csvfile, delimiter='\t', \
+                                    quotechar='#')
+            for i in range(0, len(errors)):
+                datawriter.writerow(errors[i])
+            
+
                     
     print "Finished processing", filename, "Output in:", outdir
         
