@@ -6,32 +6,70 @@ import sys
 import os
 import getopt
 from utils import * 
+    
+def showmap(npd, maxsavings, deltasavings, success, ndays, t0, alpha, score):
+    # grid preparation
+    y = []
+    for i in range(0, npd + 1):
+        y.append((1 - maxsavings) + i * deltasavings)
+    x = range(0, ndays - t0)
+    X,Y = np.meshgrid(x,y)
+
+    # the truth
+    plt.subplot(131)
+    plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
+    plt.clim(0,1)
+
+    # our estimates
+    plt.subplot(132)
+    plt.contourf(X,Y,alpha,[0,0.2,0.4,0.6,0.8,1])
+    plt.clim(0,1)
+
+    # the corresponding score (1 is good, 0 is ultra bad,
+    # 0.5 we could flip a coin instead
+    plt.subplot(133)
+    plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
+    plt.clim(0,1)
+
+    plt.colorbar()
+    plt.show()
+
 
 def main(argv):
     filename = 'data/PARFCO_MON_45.csv'
     outdir = 'testout'
-    t0skip = 1
+    t0skip = 10
     groupskip = 1
     writesuccess = False
     exportScore = False
     kindOfStat = 'median'
     showColorMaps = False
+    domeansuccess = False
+    subalpha = True
+    verbose = False
     
+    # parameters
+    maxsavings = 0.35
+    npd = 200
+
     usage = '''
-    ./test.py 
-       -f <input filename>    : input filename
-       -d <output directory>  : output dir
-       -t <bool>  : print success per group or no.
-       -s <int>  : do every <int> t0s
-       -S <int>  : do every <int> flight groups
-       -w <0 or 1> : write success (and pt0) for each group and t0.
-       -m <0 or 1> : export score image for all groups (one image).
-       -k <median or mean>: in score image use either the mean or the median (ignored if -m=0).
-       -c <0 or 1> : show the color maps for each flight.
+./test.py
+    -f <input filename>    : input filename
+    -d <output directory>  : output dir
+    -s <int>  : do every <int> t0s
+    -S <int>  : do every <int> flight groups
+    -w <0 or 1> : write success (and pt0) for each group and t0.
+    -m <0 or 1> : export score image for all groups (one image).
+    -M <0 or 1> : compute mean success (one image).
+    -a <0 or 1> : Subtract alpha from mean success?
+    -k <median or mean>: in score image use either the mean or the
+       median (ignored if -m=0).
+    -c <0 or 1> : show the color maps for each flight.
+    -v : verbose output
     '''
 
     try:
-        opts, args = getopt.getopt(argv,"f:d:s:S:w:m:k:c:h")
+        opts, args = getopt.getopt(argv,"f:a:d:s:S:w:m:M:k:c:hv")
     except getopt.GetoptError:
         print usage
         sys.exit(2)
@@ -51,40 +89,47 @@ def main(argv):
             writesuccess = (int(arg) == 1)
         if opt in ("-m"):
             exportScore = (int(arg) == 1)
+        if opt in ("-M"):
+            domeansuccess = (int(arg) == 1)
+        if opt in ("-a"):
+            subalpha = (int(arg) == 1)
         if opt in ("-k"):
             kindOfStat = arg
-            if kindOfStat != 'mean':
-                if kindOfStat != 'median':
-                    print usage
-                    sys.exit(2)
         if opt in ("-c"):
             showColorMaps = (int(arg) == 1)
-            if showColorMaps:
-                if exportScore:
-                    print ''' 
-    The options exportScore and showColorMaps are not compatible!
-    Use only one of the two!
-    '''
-                    print usage
-                    sys.exit(2)
-    
-    #extracting flight information
+        if opt in ("-v"):
+            verbose = True
+            
+    if showColorMaps and exportScore:
+        print 'The options exportScore and showColorMaps are not compatible!'
+        print usage
+        sys.exit(2)
+
+    if kindOfStat != 'mean' and  kindOfStat != 'median':
+        print "Invalid stat choice"
+        print usage
+        sys.exit(2)
+        
+    # extracting flight information
     volStart = filename[5:8]
     volEnd = filename[8:11]
     kind = filename[12:]
     p = kind.find('.csv')
     kind = kind[:p]
 
-    flightInfo = 'Flight from: '+volStart+' to '+volEnd
+    flightInfo = 'Flight from: ' + volStart + ' to ' + volEnd
     print flightInfo
     print 'Opening file:', filename
     csvfile =  open(filename, 'rb')
     csvreader = csv.reader(csvfile, delimiter=',')
 
+    
     rowdata = []
     for row in csvreader:
         rowdata.append(row)
 
+    print len(rowdata) - 1, "flights found."
+        
     # for each single date we store here the number of flights
     # corresponding to a certain date:
     # find all unique dates.
@@ -119,12 +164,8 @@ def main(argv):
         theta2=0.002
         return 1.0 / (1.0+np.exp( -(S-S0) ) + theta/(T+0.00001) + theta2*minPrice/( max(pdemand-minPrice,0.000001) ) )
 
-    # parameters
-    maxsavings = 0.35
-    npd = 200
-
     maxdays = ndays - 1
-    
+
     # Create the pmin.dat files
     if(writesuccess):
         for t0 in range(0, maxdays, t0skip):
@@ -133,11 +174,20 @@ def main(argv):
                 os.makedirs(outdirt0)
             f = open(outdirt0 + '/pmin.dat', 'w')
             f.close()
-            
+
+    meansuccess = []
+    if(domeansuccess):
+        for t0 in range(0, maxdays, t0skip):
+            meansuccess.append(np.zeros((npd + 1, ndays - t0)))
+    meansuccesscount = 0
+
     # for each group of flights
     for idata in range(0, len(datas), groupskip):
-        print "date:", dates[idata], "nflights:", nflights[idata]
+        print "date:", dates[idata], "nflights:", nflights[idata], \
+            "\t", idata, "/", (len(datas) / groupskip)
 
+        meansuccesscount += 1
+        
         data = datas[idata]
 
         pmin = findminprices(nflights[idata], data, ndays)
@@ -155,19 +205,23 @@ def main(argv):
             print "output directory:", outdir
             if not os.path.exists(outdir):
                 os.makedirs(outdir)
-        
-        t0 = 0
+
+        # for meansuccess
+        t0index = -1 
 
         for t0 in range(0, maxdays, t0skip):
             pt0 = findstartprice(t0, pmin)
-            print "t0:", t0, "pt0:", pt0
+            if(verbose):
+                print "t0:", t0, "pt0:", pt0
 
+            t0index += 1
+            
             pdmax = pt0
             pdmin = (1 - maxsavings) * pdmax
             deltapd = (pdmax - pdmin) / npd
 
-            alpha = np.zeros((npd + 1, ndays-t0))
-            success = np.zeros((npd + 1, ndays-t0))
+            alpha = np.zeros((npd + 1, ndays - t0))
+            success = np.zeros((npd + 1, ndays - t0))
 
             for i in range(0, npd + 1):
                 pdemand = pdmin + i * deltapd
@@ -175,7 +229,7 @@ def main(argv):
                 for j in range(0, ndays - t0):
                     if(j >= iTgood):
                         success[i][j] = 1
-
+            
             if(writesuccess):
                 outdirt0 = outdir + "/t0_" + str(t0)
                 fileout = outdirt0 + "/success" + str(idata) + ".dat"
@@ -195,6 +249,12 @@ def main(argv):
                     #alpha[i][j] = falpha(pt0, j, pdemand)
                     alpha[i][j] = falphaWithMin(pt0, j, pdemand,minPrice)
 
+            if(domeansuccess):
+                if(subalpha):
+                    meansuccess[t0index] += success - alpha
+                else:
+                    meansuccess[t0index] += success
+
             deltasavings = maxsavings / npd
 
             difference = success - alpha
@@ -209,42 +269,48 @@ def main(argv):
                 elif kindOfStat == 'median':
                     medianOfScore = np.median(score)
                     medianOfThisGroup.append(medianOfScore)
+
             if showColorMaps:
-                #grid preparation
-                y = []
-                for i in range(0,npd+1):
-                    y.append((1 - maxsavings) + i * deltasavings)
-                x = range(0, ndays-t0)
-                X,Y = np.meshgrid(x,y)
-
-                # the truth
-                plt.subplot(131)
-                plt.contourf(X,Y,success,[0,0.2,0.4,0.6,0.8,1])
-                plt.clim(0,1)
-
-                # our estimates
-                plt.subplot(132)
-                plt.contourf(X,Y,alpha,[0,0.2,0.4,0.6,0.8,1])
-                plt.clim(0,1)
-
-                #the corresponding score (1 is good, 0 is ultra bad, 0.5 we could flip a coin instead
-                plt.subplot(133)
-                plt.contourf(X,Y,score,[0,0.2,0.4,0.6,0.8,1])
-                plt.clim(0,1)
-
-                plt.colorbar()
-                plt.show()
+                showmap(npd, maxsavings, deltasavings, success, ndays, t0, \
+                        alpha, score)
 
         if (exportScore):
             if kindOfStat == 'mean' :
-                plt.errorbar(range(0,len(scoreOfThisGroup)),scoreOfThisGroup,stdOfThisGroup)
+                plt.errorbar(range(0, len(scoreOfThisGroup)),\
+                             scoreOfThisGroup, stdOfThisGroup)
             if kindOfStat == 'median' :
                 plt.plot(medianOfThisGroup)
             plt.ylim([0,1])
+
     if (exportScore):
-        plt.title(flightInfo +' '+' '+ kind+'. Score')
-        plt.savefig(outdir+'/Score'+volStart+volEnd+'_'+kind)
+        plt.title(flightInfo + ' ' + ' ' + kind + '. Score')
+        plt.savefig(outdir + '/Score' + volStart + volEnd + '_' + kind)
         plt.show()
+        
+    if(domeansuccess):
+        errors = []
+        for i in range(0, len(meansuccess)):
+            meansuccess[i] /= meansuccesscount
+            t0 = i * t0skip
+            #errors.append([t0, l2norm(meansuccess[i])])
+            errors.append([t0, l1norm(meansuccess[i])])
+            outfilei = "meansuccess" + str(t0) + ".dat"
+            if not os.path.exists(outdir):
+                os.makedirs(outdir)
+            with open(outdir + "/" + outfilei, 'wb') as csvfile:
+                datawriter = csv.writer(csvfile, delimiter='\t', \
+                                        quotechar='#')
+                for j in range(0, len(meansuccess[i])):
+                    datawriter.writerow(meansuccess[i][j])
+        print (outdir + "/normvst0.dat")
+        with open(outdir + "/normvst0.dat", 'wb') as csvfile:
+            datawriter = csv.writer(csvfile, delimiter='\t', \
+                                    quotechar='#')
+            for i in range(0, len(errors)):
+                datawriter.writerow(errors[i])
+
+                    
+    print "Finished processing", filename, "Output in:", outdir
         
 # The main program is called from here
 if __name__ == "__main__":
