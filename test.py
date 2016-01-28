@@ -38,7 +38,7 @@ def showmap(npd, maxsavings, deltasavings, success, ndays, t0, alpha, score):
 def main(argv):
     filename = 'data/PARFCO_MON_45.csv'
     outdir = 'testout'
-    t0skip = 1
+    t0skip = 10
     groupskip = 1
     writesuccess = False
     exportScore = False
@@ -173,7 +173,7 @@ def main(argv):
     # for each group of flights
     for idata in range(0, len(datas), groupskip):
         print "date:", dates[idata], "nflights:", nflights[idata], \
-            "\t", idata, "/", len(datas) / groupskip
+            "\t", idata, "/", (len(datas) / groupskip)
 
         meansuccesscount += 1
         
@@ -278,7 +278,7 @@ def main(argv):
     if(domeansuccess):
         for i in range(0, len(meansuccess)):
             meansuccess[i] /= meansuccesscount
-            outfilei = "meansuccess" + str(i) + ".dat"
+            outfilei = "meansuccess" + str(i * t0skip) + ".dat"
             if not os.path.exists(outdir):
                 os.makedirs(outdir)
             with open(outdir + "/" + outfilei, 'wb') as csvfile:

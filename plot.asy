@@ -9,6 +9,8 @@ string filename = getstring("filename","testout/meansuccess0.dat");
 file in1=input(filename).line().csv();
 real[][] f=in1.dimension(0,0);
 
+int t0 = getint("t0");
+
 write(f.length);
 write(f[0].length);
 
@@ -29,7 +31,7 @@ else {
 real maxsavings = 0.35;
 
 picture bar;
-bounds range=image(f,(0,1.0 - maxsavings),(1,1),Palette);
+bounds range=image(f,(t0,1.0 - maxsavings),(130,1),Palette);
 
 // Make the colour bar go from 0 to 1:
 range.min = 0;
