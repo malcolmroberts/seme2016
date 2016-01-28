@@ -10,6 +10,15 @@ def l2norm(data):
             norm += val * val
     return np.sqrt(norm) / (len(data) * len(data[0]))
 
+def l1norm(data):
+    norm = 0.0
+    for i in range(0, len(data)):
+        for j in range(0, len(data[0])):
+            val = np.abs(data[i][j])
+            norm += val
+    return norm / (len(data) * len(data[0]))
+
+
 def finduniquedates(rowdata):
     nflights = []
     dates = []

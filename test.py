@@ -279,7 +279,8 @@ def main(argv):
         for i in range(0, len(meansuccess)):
             meansuccess[i] /= meansuccesscount
             t0 = i * t0skip
-            errors.append([t0, l2norm(meansuccess[i])])
+            #errors.append([t0, l2norm(meansuccess[i])])
+            errors.append([t0, l1norm(meansuccess[i])])
             outfilei = "meansuccess" + str(t0) + ".dat"
             if not os.path.exists(outdir):
                 os.makedirs(outdir)
@@ -293,7 +294,7 @@ def main(argv):
                                     quotechar='#')
             for i in range(0, len(errors)):
                 datawriter.writerow(errors[i])
-            
+                print errors[i]
 
                     
     print "Finished processing", filename, "Output in:", outdir

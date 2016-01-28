@@ -25,7 +25,7 @@ int lastpos;
 bool doxticks=true;
 bool doyticks=true;
 string xlabel="Day";
-string ylabel="$L_2$ error";
+string ylabel="$L_1$ error";
 
 usersetting();
 bool myleg=((legendlist == "") ? false: true);
