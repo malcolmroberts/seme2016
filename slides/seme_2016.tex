@@ -108,10 +108,11 @@
 \section{The aim of the estimator}
 \subsection{The settings} 
 \frame{
+  \frametitle{The settings}
   The customer enters a set of criteria for its flight. In this work,
   only the following are considered
   \begin{itemize}
-  \item the route (eg Paris - NYC,  2014-07-24, 2014-08-10)
+  \item the route (eg Paris - NYC,  2014-07-24, 2014-08-10, \dots)
   \item the start time $t_0$ (for the option),
   \item the demanded price $p_d$ (for the option),
   \item the expiry time $T$ at the option expires (for the option). 
@@ -128,7 +129,8 @@
 }
 
 \subsection{The goal of the estimator} 
-\frame{ 
+\frame{
+  \frametitle{The goal of the estimator}
   \begin{itemize}
   \item When $(t_0,T,p_d)$ and the route are given, Option Way
     evaluates the possibility to terminate the option before time
@@ -167,11 +169,12 @@
 \section{The test}
 \subsection{Explanation of the test}
 \frame{
+  \frametitle{Explanation of the test}
   \textbf{Explanation:} we want to test the prediction of the
   relevance of the option given by Option Way. \\
   Example: 
   \begin{itemize} 
-  \item My travel lasts $20$ days and the departure in on Monday in
+  \item My travel lasts $20$ days and the departure on Monday in
     two months.
   \item I demand a price $p_d$ for this specific flight.  
   \end{itemize}
@@ -193,7 +196,7 @@
     \end{center}
   \end{figure}
 } \frame{
-  $\to$ The Optin Way website returns a probability $\red \alpha$ for
+  $\to$ The Option Way website returns a probability $\red \alpha$ for
   the relevance of my option: what is the "probability" to find the
   flight ticket at price $p_d$ before this time limit? It is $\red
   \alpha$. \\
@@ -213,7 +216,7 @@
 
 \subsection{Remarks on the test}
 \frame{
-  Remarks on the test.
+  \frametitle{Remarks on the test}
   \begin{itemize}
   \item if $Test_1:=V-\alpha \in [-1,1]$ is positive, $\alpha$ is
     pessimistic. If it is negative, $\alpha$ is optimistic.
@@ -500,7 +503,7 @@ $$
 
 
 \frame{
-  \frametitle{comparaison of the models for the flight PARIS-ROMA }
+  \frametitle{Comparison of the models for the flight PARIS-ROMA }
   \small{Form top to bottom and from left to right : the model $\alpha$ , the model $\beta$ with an exact estimation of $p_{min}$, $\beta$ with an over estimation of $p_{min}$and $\beta$ with an under estimation of $p_{min}$}
 
   \begin{columns}
