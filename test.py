@@ -34,6 +34,27 @@ def showmap(npd, maxsavings, deltasavings, success, ndays, t0, alpha, score):
     plt.colorbar()
     plt.show()
 
+# algorithm
+def falpha(pt0, T, pdemand):
+    if(pdemand >= pt0):
+        return 1
+    if(T == 0):
+        return 0
+    b=11
+    a=4500/10.5
+    return 1.0 / (1.0+ np.exp(-b * pdemand / pt0) * a * pt0 / T )
+
+def falphaWithMin(pt0, T, pdemand,minPrice):
+    Tf=130
+    beta=8
+    gamma=12
+    delta=7
+    theta=7 #Warning: this one is in days
+    S=beta*pdemand/pt0+gamma*(1-minPrice/pt0)+delta*T/Tf
+    S0=10
+    theta2=0.01
+    return 1.0 / (1.0 + np.exp( -(S - S0) ) + theta / (T + 0.00001) \
+                  + theta2 * minPrice / ( max(pdemand - minPrice, 0.000001) ) )
 
 def main(argv):
     filename = 'data/PARFCO_MON_45.csv'
@@ -49,6 +70,7 @@ def main(argv):
     verbose = False
     alpha = 0
 
+    # which alpha function will we use?
     alphachoice = 0
     
     # parameters
@@ -105,7 +127,6 @@ def main(argv):
             verbose = True
         if opt in ("-A"):
             alphachoice = int(arg)
-
             
     if showColorMaps and exportScore:
         print 'The options exportScore and showColorMaps are not compatible!'
@@ -129,7 +150,6 @@ def main(argv):
     print 'Opening file:', filename
     csvfile =  open(filename, 'rb')
     csvreader = csv.reader(csvfile, delimiter=',')
-
     
     rowdata = []
     for row in csvreader:
@@ -149,27 +169,6 @@ def main(argv):
     ndays = 130
 
     datas = organizedata(dates, nflights, rowdata, ndays)
-    
-    # algorithm
-    def falpha(pt0, T, pdemand):
-        if(pdemand >= pt0):
-            return 1
-        if(T == 0):
-            return 0
-        b=11
-        a=4500/10.5
-        return 1.0 / (1.0+ np.exp(-b * pdemand / pt0) * a * pt0 / T )
-
-    def falphaWithMin(pt0, T, pdemand,minPrice):
-        Tf=130
-        beta=8
-        gamma=12
-        delta=7
-        theta=7 #Warning: this one is in days
-        S=beta*pdemand/pt0+gamma*(1-minPrice/pt0)+delta*T/Tf
-        S0=10
-        theta2=0.01
-        return 1.0 / (1.0+np.exp( -(S-S0) ) + theta/(T+0.00001) + theta2*minPrice/( max(pdemand-minPrice,0.000001) ) )
 
     maxdays = ndays - 1
 
@@ -194,7 +193,8 @@ def main(argv):
         pmin = findminprices(nflights[idata], datas[idata], ndays)
         minPrice = min(pmin)
         globalMinForThisRoute = min(minPrice,globalMinForThisRoute)
-    
+    print "global min price:", globalMinForThisRoute
+        
     # for each group of flights
     for idata in range(0, len(datas), groupskip):
         print "date:", dates[idata], "nflights:", nflights[idata], \
