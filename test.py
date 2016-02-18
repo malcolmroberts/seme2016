@@ -48,6 +48,8 @@ def main(argv):
     subalpha = True
     verbose = False
     alpha = 0
+
+    alphachoice = 0
     
     # parameters
     maxsavings = 0.35
