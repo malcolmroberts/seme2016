@@ -6,7 +6,27 @@ import sys
 import os
 import getopt
 from utils import * 
+
+# read the csv file, find the dates and nflights for each date, and
+# then construct the array of data.
+def process_csv(filename, ndays):
+    print 'Opening file:', filename
+    csvfile =  open(filename, 'rb')
+    csvreader = csv.reader(csvfile, delimiter=',')
     
+    rowdata = []
+    for row in csvreader:
+        rowdata.append(row)
+
+    print len(rowdata) - 1, "flights found."
+
+    dates, nflights = finduniquedates(rowdata)
+
+    datas = organizedata(dates, nflights, rowdata, ndays)
+
+    return datas, dates, nflights
+    
+
 def showmap(npd, maxsavings, deltasavings, success, ndays, t0, alpha, score):
     # grid preparation
     y = []
@@ -144,32 +164,12 @@ def main(argv):
     kind = filename[12:]
     p = kind.find('.csv')
     kind = kind[:p]
-
     flightInfo = 'Flight from: ' + volStart + ' to ' + volEnd
     print flightInfo
-    print 'Opening file:', filename
-    csvfile =  open(filename, 'rb')
-    csvreader = csv.reader(csvfile, delimiter=',')
-    
-    rowdata = []
-    for row in csvreader:
-        rowdata.append(row)
-
-    print len(rowdata) - 1, "flights found."
-        
-    # for each single date we store here the number of flights
-    # corresponding to a certain date:
-    # find all unique dates.
-    # vector that will contain the unique dates as strings:
-    dates, nflights = finduniquedates(rowdata)
-
-    print "Number of unique dates found:", len(dates)
-    #print "Number of flights for each of these dates:", nflights
 
     ndays = 130
-
-    datas = organizedata(dates, nflights, rowdata, ndays)
-
+    datas, dates, nflights = process_csv(filename, ndays)
+    
     maxdays = ndays - 1
 
     # Create the pmin.dat files
