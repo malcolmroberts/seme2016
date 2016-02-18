@@ -24,6 +24,7 @@ def process_csv(filename, ndays):
 
     datas = organizedata(dates, nflights, rowdata, ndays)
 
+    print 'Finished reading file.'
     return datas, dates, nflights
     
 
