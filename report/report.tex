@@ -9,6 +9,10 @@
 \definecolor{heavyblue}{cmyk}{1,1,0,0.25}
 
 \newcommand{\thetitle}{SEME 2016: OptionWay Project Report}
+\newcommand{\theauthors}{Malcolm Roberts, Athmane Bakhta, Matteo Aletti, Boris Nectoux}
+
+\title{\thetitle{}}
+\author{\theauthors{}}
 
 \hypersetup{
   pdftitle={\thetitle},
@@ -17,7 +21,7 @@
   colorlinks=true,
   allcolors=heavyblue,
   breaklinks=true,
-  pdfauthor={Malcolm Roberts, Athmane Bakhta, Matteo Aletti, Boris Nectoux},
+  pdfauthor={\theauthors},
   pdfpagetransition=Dissolve,
   bookmarks=true
 }
@@ -32,14 +36,78 @@
 
 \begin{document}
 
-\begin{center}
-  \thetitle{}\\
-  \today.
-\end{center}
+\maketitle
+
+\begin{abstract}
+  asdfasdfasdf
+\end{abstract}
 
 \section{Introduction}
 
-FIXME
+Travellers wishing to purchase a flight for a specific day to a
+particular destination are faced with a problem: how can they find the
+cheapest flight which matches their criteria?  Since the advent of
+online travel agents, it is easy to find the cheapest price available
+that day, and multiple services are available.  The travel agent
+offers a variety of prices from multiple airlines, and the consumer is
+free to choose whether or not they wish to buy.  At this point one
+would think that the problem is solved, but one must remember that
+there is another player in this particular economic game: the airline,
+which seeks to sell seats on planes in order to maximize its own
+profit.
 
+In general, there are several airlines which compete on a particular
+route, such as Paris--New York, and the airlines will vary their prices
+according to their own individual strategies (strategies which, we add
+parenthetically, produce seemingly bizarre prices).  The airlines
+compete with each other, but they can also increase their profit by
+adopting a strategy which increases the likelihood that an individual
+consumer will purchase a ticket.  In addition, there are circumstances
+where a consumer has very low price sensitivity, so it might be good
+to occasionally offer higher prices in case such a client is looking
+for a flight at the same moment when the high prices are in effect.
+
+The effect of this on the consumer is that there is a significant
+amount of variance in the price of the cheapest flight available.  If
+the Paris--New York flight is \$1000 today, it might be \$900 next
+week, or perhaps \$1100.  Thus the optimal strategy for the consumer
+is to check the cost each day to determine the range of prices
+available and then to use that information in order to try and get a
+better price.  Each day the traveller will visit various websites,
+collect data, and, when they think that they have enough information,
+start looking for a flight.  While there may certainly be some
+travellers who find this sort of activity a great way to spend a
+Friday night, the vast majority will probably find the use of their
+time sub-optimal for what may end up being a fairly minimal savings in
+cost.
+
+The online travel agent OptionWay autmoates this process; the
+traveller specifies their destination and travel dates, the price that
+they are willing to pay for the trip, and the length of time that they
+want OptionWay to look for the ticket.  If their criteria are
+satisfied during this time, OptionWay automatically buys the ticket
+when the specified price is available.  Using this method, the
+traveller is saved the drudgery of manually searching for flights on a
+daily basis.
+
+However, the demand price may or may not be likely to appear in the
+specified search period.  For example, if the traveller wants to fly
+Paris--New York for \$400, they are likley to never find a ticket at
+such a price.  OptionWay would like to provide an estimate for the
+probability of the chance of success of their demand.
+
+\section{Data and Analysis}
+
+OptionWay provided us with sample data for flights to various
+destinations.  The data was composed of all the flight prices for a
+particular route for travel on a variety of dates, with flight prices
+available from 130 days before the flight to the day of.  Data was not
+necessarily available for each day.  There were 12 routes available.
+Data was given in the form of csv files, which ranged in size from 13M
+to 2.3G.
+
+
+
+\section{Conclusion}
 
 \end{document}
