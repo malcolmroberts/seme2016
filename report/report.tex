@@ -104,9 +104,20 @@ particular route for travel on a variety of dates, with flight prices
 available from 130 days before the flight to the day of.  Data was not
 necessarily available for each day.  There were 12 routes available.
 Data was given in the form of csv files, which ranged in size from 13M
-to 2.3G.
+to 2.3G. We show a sample of such data in
+Figure~\ref{PARFCO_SAT_7_nonorm}.
 
-
+\begin{figure}
+  \begin{center}
+    % ./plots.py -f data/PARFCO_SAT_7.csv -d PARFCO_SAT_7_nonorm
+    % asy datagraphs -u "ymax=500"
+    \includegraphics{pdf/PARFCO_SAT_7_nonorm}
+    \label{PARFCO_SAT_7_nonorm}
+    \caption{Minimum available price as a function of number of days
+      before the lgiths for PAR--FCO from Saturday to Saturday for a
+      variety of departure dates. Prices abore 500 were excluded.}
+  \end{center}
+\end{figure}
 
 \section{Conclusion}
 

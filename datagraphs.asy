@@ -7,7 +7,7 @@ import utils;
 
 texpreamble("\usepackage{bm}");
 
-size(400,300,IgnoreAspect);
+size(300,200,IgnoreAspect);
 
 scale(Linear,Linear);
 
@@ -45,6 +45,7 @@ while(flag) {
     a=transpose(a);
     real[] x=a[0];
     real[] y=a[1];
+    x -= 130;
     pen p=Pen(n);
     if(n == 1) p += dashed;
     if(n == 2) p = darkgreen + Dotted;

@@ -18,7 +18,7 @@ def main(argv):
     
     usage = '''
     ./plots.py 
-       -h help!
+       -h help
        -f <input filename>   : input filename
        -d <output directory> : output directory
        -n <none, mean, pt0>  : normalization choice
