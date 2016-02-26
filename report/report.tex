@@ -34,6 +34,9 @@
 \def\(#1\){{\left(#1\right)}}
 \def\nobr#1{\hiderel{#1}}
 
+\def\aow{\alpha_{\rm{OW}}}
+\def\aobs{\alpha_{\rm{obs}}}
+
 \begin{document}
 
 \maketitle
@@ -126,7 +129,7 @@ than the Paris--Réunion trip.
 
 \begin{figure}
   \begin{center}
-    %  ./plots.py -f data/PARRUN_SAT_7.csv -d PARRUN_SAT_7_nonorm^C
+    %  ./plots.py -f data/PARRUN_SAT_7.csv -d PARRUN_SAT_7_nonorm
     % asy datagraphs -u "ymax=3000"
     \includegraphics{pdf/PARRUN_SAT_7_nonorm}
     \label{PARRUN_SAT_7_nonorm}
@@ -155,11 +158,11 @@ data.  In Figure~\ref{PARRUN_SAT_7_a0}, we show the a colourmap of the
 probability of successfully finding a flight at a price $p_d$ for
 $t_0=30$.  Notably, there is a large increase in probability in about
 30 days before travelling.  We can compare the obsered probability,
-$\alpha_{\rm{obs}}$ against equation~\eqref{owalpha} for individual lines.
-Such a comparison is shown in Figure~\ref{PARRUN_SAT_7_a1_A0}, which
-shows $\alpha_{\rm{obs}}-\alpha_{\rm{OW}}$.  The difference is almost
-entirely negative, indicating that the OptionWay estimate errs heavily
-on the side of optimism.
+$\alpha_{\rm{obs}}$ against equation~\eqref{owalpha} for individual
+lines.  Such a comparison is shown in Figure~\ref{PARRUN_SAT_7_a1_A0},
+which shows $\alpha_{\rm{obs}}-\alpha_{\rm{OW}}$.  The difference is
+almost entirely negative, indicating that the OptionWay estimate errs
+heavily on the side of optimism.  
 \begin{figure}
   \begin{center}
     %./test.py -f data/PARRUN_SAT_7.csv -a0
@@ -189,9 +192,57 @@ on the side of optimism.
     %asy datagraphs -u"dolegend=true" -u"legendlist=\"PARFCO_MON_123,PARMAD_SAT_7,PARFCO_MON_45,PARNYC_SAT_7,PARFCO_SAT_7,PARRUN_ALL,PARMAD_MON_123,PARRUN_SAT_7,PARMAD_MON_45\""
     \includegraphics{pdf/plotA0}
     \label{plotA0}
-    \caption{FIXME}
+    \caption{Difference between $\alpha_{\rm{OW}}$ and
+      $\alpha_{\rm{obs}}$ as a function of $t_0$.}
   \end{center}
 \end{figure}
+
+In Figure~\ref{plotA0} we show the $L_1$ diference between $\aobs$ and
+$\aow$ as a function of $t_0$ for a variety of flights.  For a
+majority of the flights considered, $\aow$ has poor accuracy for early
+$t_0$, but this improves as the departure date approaches; near the
+date of departure, $\aow$ succesfully predicts that a deal is highly
+unlikely.  However, there are three cases for which $\aow$ performs
+much better.  What is the difference?  Is there some property of these
+flights which explains this difference?
+
+In equation~\eqref{owalpha}, the asking price $p_d$ is divided by the
+current minimum price $p(t_0)$.  We can also re-create
+figures~\ref{PARFCO_SAT_7_nonorm} and~\ref{PARRUN_SAT_7_nonorm} with
+the results scaled by $p(t_0)$.  The results are shown in
+Figures~\ref{PARFCO_SAT_7_norm} and~\ref{PARRUN_SAT_7_norm}.  After
+normalizing the data, the difference is much more clear; in
+Figures~\ref{PARFCO_SAT_7_norm}, there is a strong ris in prices at
+around $t_0=-30$, which is much less pronounced in
+Figure~\ref{PARRUN_SAT_7_norm}.  The formula given for $\aow$ is
+designed to deal with the variance in prices, but neglects any trend.
+
+\begin{figure}
+  \begin{center}
+    % ./plots.py -f data/PARFCO_SAT_7.csv -d PARFCO_SAT_7_norm -npt0
+    % asy datagraphs -u "ymax=2"
+    \includegraphics{pdf/PARFCO_SAT_7_norm}
+    \label{PARFCO_SAT_7_norm}
+    \caption{Minimum available price, normalized by $p(t_0)$, as a
+      function of number of days before the lgiths for PAR--FCO from
+      Saturday to Saturday for a variety of departure dates. Prices
+      with $p_d/p(t_0) > 2$ were excluded.}
+  \end{center}
+\end{figure}
+
+\begin{figure}
+  \begin{center}
+    %./plots.py -f data/PARRUN_SAT_7.csv -d PARRUN_SAT_7_norm  -npt0
+    % asy datagraphs -u "ymax=2"
+    \includegraphics{pdf/PARRUN_SAT_7_norm}
+    \label{PARRUN_SAT_7_norm}
+    \caption{Minimum available price, normalized by $p(t_0)$, as a
+      function of number of days before the lgiths for PAR--RUN from
+      Saturday to Saturday for a variety of departure dates.  Prices
+      with $p_d/p(t_0) > 2$ were excluded.}
+  \end{center}
+\end{figure}
+
 
 
 
