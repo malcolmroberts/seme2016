@@ -42,7 +42,7 @@
 \maketitle
 
 \begin{abstract}
-  asdfasdfasdf
+  asdfasdfasdf FIXME
 \end{abstract}
 
 \section{Introduction}
@@ -115,6 +115,9 @@ trip.  While both show a large amount of variance, the Paris-Rome trip
 shows a stronger tendency for the price to rise nearer the travel date
 than the Paris--Réunion trip.  
 
+%FIXME: we created a python script which deals with this kind of
+%thing.
+
 \begin{figure}
   \begin{center}
     % ./plots.py -f data/PARFCO_SAT_7.csv -d PARFCO_SAT_7_nonorm
@@ -172,7 +175,6 @@ heavily on the side of optimism.
       price $p_d$ for PAR--RUN for $t_0=30$.}
   \end{center}
 \end{figure}
-
 \begin{figure}
   \begin{center}
     %./test.py -f data/PARRUN_SAT_7.csv -a1 -A0
@@ -185,6 +187,14 @@ heavily on the side of optimism.
   \end{center}
 \end{figure}
 
+In Figure~\ref{plotA0} we show the $L_1$ diference between $\aobs$ and
+$\aow$ as a function of $t_0$ for a variety of flights.  For a
+majority of the flights considered, $\aow$ has poor accuracy for early
+$t_0$, but this improves as the departure date approaches; near the
+date of departure, $\aow$ succesfully predicts that a deal is highly
+unlikely.  However, there are three cases for which $\aow$ performs
+much better.  What is the difference?  Is there some property of these
+flights which explains this difference?
 \begin{figure}
   \begin{center}
     % ./rundiffA0.sh
@@ -197,15 +207,6 @@ heavily on the side of optimism.
   \end{center}
 \end{figure}
 
-In Figure~\ref{plotA0} we show the $L_1$ diference between $\aobs$ and
-$\aow$ as a function of $t_0$ for a variety of flights.  For a
-majority of the flights considered, $\aow$ has poor accuracy for early
-$t_0$, but this improves as the departure date approaches; near the
-date of departure, $\aow$ succesfully predicts that a deal is highly
-unlikely.  However, there are three cases for which $\aow$ performs
-much better.  What is the difference?  Is there some property of these
-flights which explains this difference?
-
 In equation~\eqref{owalpha}, the asking price $p_d$ is divided by the
 current minimum price $p(t_0)$.  We can also re-create
 figures~\ref{PARFCO_SAT_7_nonorm} and~\ref{PARRUN_SAT_7_nonorm} with
@@ -216,7 +217,6 @@ Figures~\ref{PARFCO_SAT_7_norm}, there is a strong ris in prices at
 around $t_0=-30$, which is much less pronounced in
 Figure~\ref{PARRUN_SAT_7_norm}.  The formula given for $\aow$ is
 designed to deal with the variance in prices, but neglects any trend.
-
 \begin{figure}
   \begin{center}
     % ./plots.py -f data/PARFCO_SAT_7.csv -d PARFCO_SAT_7_norm -npt0
@@ -244,9 +244,19 @@ designed to deal with the variance in prices, but neglects any trend.
 \end{figure}
 
 
-
-
+FIXME: mention our own hack, say that it might work better.
 
 \section{Conclusion}
+
+FIXME: Summary of what has been done.
+
+FIXME: Future work: look at the distribution.  They are also talking with a
+data lab at INRIA who are applying a more statistical model. 
+
+FIXME: Also, look at clustering, particularly so that one can apply
+the information to new routes for which one does not yet have a huge
+amount of (expensive) data.
+
+FIXME: acknowledgements.
 
 \end{document}
