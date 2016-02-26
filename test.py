@@ -86,7 +86,7 @@ def main(argv):
     exportScore = False
     kindOfStat = 'median'
     showColorMaps = False
-    domeansuccess = False
+    domeansuccess = True
     subalpha = True
     verbose = False
     alpha = 0
@@ -104,14 +104,14 @@ def main(argv):
     -d <output directory>  : output dir
     -s <int>  : do every <int> t0s
     -S <int>  : do every <int> flight groups
-    -w <0 or 1> : write success (and pt0) for each group and t0.
-    -m <0 or 1> : export score image for all groups (one image).
-    -M <0 or 1> : compute mean success (one image).
     -a <0 or 1> : Subtract alpha from mean success?
     -k <median or mean>: in score image use either the mean or the
        median (ignored if -m=0).
-    -c <0 or 1> : show the color maps for each flight.
     -A <0 or 1> : 0: OptionWay's alpha.  1: our alpha.
+    -w <0 or 1> : write success (and pt0) for each group and t0.
+    -m <0 or 1> : export score image for all groups (one image).
+    -M <0 or 1> : compute mean success (one image).
+    -c <0 or 1> : show the color maps for each flight.
     -v : verbose output
     '''
 
@@ -148,7 +148,24 @@ def main(argv):
             verbose = True
         if opt in ("-A"):
             alphachoice = int(arg)
-            
+
+    print "Input filename:", filename
+    print "Skipping every", t0skip, "days"
+    print "Skipping every", groupskip, "flights"
+
+    print
+    
+    print "subalpha:", subalpha
+    print "alphachoice:", alphachoice
+    print "domeansuccess:", domeansuccess
+
+    print
+
+    print "exportScore:", exportScore
+    print "showColorMaps:", showColorMaps
+
+    print
+    
     if showColorMaps and exportScore:
         print 'The options exportScore and showColorMaps are not compatible!'
         print usage
@@ -158,6 +175,11 @@ def main(argv):
         print "Invalid stat choice"
         print usage
         sys.exit(2)
+
+    print "output directory:", outdir
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
         
     # extracting flight information
     volStart = filename[5:8]
@@ -212,11 +234,6 @@ def main(argv):
                 stdOfThisGroup = []
             elif kindOfStat == 'median':
                 medianOfThisGroup = []
-
-        if writesuccess:
-            print "output directory:", outdir
-            if not os.path.exists(outdir):
-                os.makedirs(outdir)
 
         # for meansuccess
         t0index = -1 

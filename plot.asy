@@ -47,7 +47,7 @@ bounds range;
 
 
 if(graphtype == "success") {
-  range = image(f,Range(0, 1), (t0,1.0 - maxsavings),(130,1),Palette);
+  range = image(f,Range(0, 1), (t0-130,1.0 - maxsavings),(1,1),Palette);
   // Make the colour bar go from 0 to 1:
   range.min = 0;
   range.max = 1;
@@ -59,11 +59,11 @@ if(graphtype == "diff") {
   //range.max = 1;
 }
 
-string barleg = (graphtype == "success") ? "probabilty of success" : "difference";
+string barleg = (graphtype == "success") ? "Probabilty of success" : "Difference";
 palette(bar,barleg,range,(0,0),(0.5cm,6cm),Right,Palette,
         PaletteTicks("$%+#.1f$"));
 add(bar.fit(),point(E),30E);
 
 
-xaxis("time",BottomTop,RightTicks,above=true);
+xaxis("Days before flight",BottomTop,RightTicks,above=true);
 yaxis("$p_d/p(t_0)$",LeftRight,LeftTicks,above=true);

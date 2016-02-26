@@ -105,7 +105,12 @@ available from 130 days before the flight to the day of.  Data was not
 necessarily available for each day.  There were 12 routes available.
 Data was given in the form of csv files, which ranged in size from 13M
 to 2.3G. We show a sample of such data in
-Figure~\ref{PARFCO_SAT_7_nonorm}.
+Figure~\ref{PARFCO_SAT_7_nonorm} for flights between Paris and Rome
+from Saturday to Saturday.  In Figure~\ref{PARRUN_SAT_7_nonorm}, we
+show data for Paris--Ile Réunion, also for a Saturday-to-Saturday
+trip.  While both show a large amount of variance, the Paris-Rome trip
+shows a stronger tendency for the price to rise nearer the travel date
+than the Paris--Réunion trip.  
 
 \begin{figure}
   \begin{center}
@@ -118,6 +123,67 @@ Figure~\ref{PARFCO_SAT_7_nonorm}.
       variety of departure dates. Prices abore 500 were excluded.}
   \end{center}
 \end{figure}
+
+\begin{figure}
+  \begin{center}
+    %  ./plots.py -f data/PARRUN_SAT_7.csv -d PARRUN_SAT_7_nonorm^C
+    % asy datagraphs -u "ymax=3000"
+    \includegraphics{pdf/PARRUN_SAT_7_nonorm}
+    \label{PARRUN_SAT_7_nonorm}
+    \caption{Minimum available price as a function of number of days
+      before the lgiths for PAR--RUN from Saturday to Saturday for a
+      variety of departure dates. Prices abore 3000 were excluded.}
+  \end{center}
+\end{figure}
+
+\section{Probability Estimators}
+The probability of an asking price $p_d$ being achieved during a
+search interval $T$ is denoted by $\alpha$.  Let $p(t)$ denote the
+minimum price at time $t$, in days, for the a given flight, and $t_0$
+the time when the traveller starts looking for a ticket.  As a rough
+estimate, OptionWay uses the following formula to predict the
+probability that the client will succeed:
+\begin{dmath}
+  \alpha_{\rm{OW}}(t_o,T,p_d) = \frac{1}{1 + \frac{4500 p(t_0)}{4.5 T}e^{-11 p_d / p(t_0)}}.
+  \label{owalpha}
+\end{dmath}
+The motivation behind this formula was to construct a function that
+gives a higher probability when $p_d$ and $T$ are large.
+
+We can test the accuracy of equation~\eqref{owalpha} agains the given
+data.  In Figure~\ref{PARRUN_SAT_7_a0}, we show the a colourmap of the
+probability of successfully finding a flight at a price $p_d$ for
+$t_0=30$.  Notably, there is a large increase in probability in about
+30 days before travelling.  We can compare the obsered probability,
+$\alpha_{\rm{obs}}$ against equation~\eqref{owalpha} for individual lines.
+Such a comparison is shown in Figure~\ref{PARRUN_SAT_7_a1_A0}, which
+shows $\alpha_{\rm{obs}}-\alpha_{\rm{OW}}$.  The difference is almost
+entirely negative, indicating that the OptionWay estimate errs heavily
+on the side of optimism.
+\begin{figure}
+  \begin{center}
+    %./test.py -f data/PARRUN_SAT_7.csv -a0
+    \includegraphics{pdf/PARRUN_SAT_7_a0}
+    \label{PARRUN_SAT_7_a0}
+    \caption{Probability of success $\alpha_{\rm{obs}}$ for an asking
+      price $p_d$ for PAR--RUN for $t_0=30$.}
+  \end{center}
+\end{figure}
+
+\begin{figure}
+  \begin{center}
+    %./test.py -f data/PARRUN_SAT_7.csv -a1 -A0
+    \includegraphics{pdf/PARRUN_SAT_7_a1_A0}
+    \label{PARRUN_SAT_7_a1_A0}
+    \caption{Difference $\alpha_{\rm{obs}} - \alpha_{\rm{OW}}$ in
+      prediction of probability of success between empirical
+      measurement and equation~\eqref{owalpha} for an asking price
+      $p_d$ for PAR--RUN for $t_0=30$.}
+  \end{center}
+\end{figure}
+
+% ./rundiffA0.sh
+
 
 \section{Conclusion}
 
