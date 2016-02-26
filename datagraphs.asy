@@ -31,15 +31,24 @@ usersetting();
 bool myleg=((legendlist == "") ? false: true);
 string[] legends=set_legends(legendlist);
 
+write(legends);
+
 while(flag) {
   ++n;
   int pos=find(filenames,",",lastpos);
-  if(lastpos == -1) {filename=""; flag=false;}
-  filename=substr(filenames,lastpos,pos-lastpos);
-
+  if(lastpos == -1) {
+    filename="";
+    flag=false;
+  }
+  
   if(flag) {
-    lastpos=pos > 0 ? pos+1 : -1;
-
+    filename=substr(filenames,lastpos,pos-lastpos);
+    write("filename: " + filename);
+    if(myleg) write(legends[n]);
+    
+    lastpos=pos > 0 ? pos + 1 : -1;
+    
+    
     file fin=input(filename).line();
     real[][] a=fin.dimension(0,0);
     a=transpose(a);
@@ -52,7 +61,7 @@ while(flag) {
     if(ymax > 0)
       draw(graph(x,y,y < ymax), p,myleg ? legends[n] : texify(filename));
     else
-      draw(graph(x,y), p,myleg ? legends[n] : texify(filename));
+      draw(graph(x,y), p,myleg ? texify(legends[n]) : texify(filename));
   }
 }
 
