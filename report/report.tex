@@ -36,6 +36,9 @@
 
 \def\aow{\alpha_{\rm{OW}}}
 \def\aobs{\alpha_{\rm{obs}}}
+\def\anew{\alpha_{\rm{new}}}
+\def\pmin{p_{\rm{min}}}
+
 
 \begin{document}
 
@@ -107,16 +110,15 @@ particular route for travel on a variety of dates, with flight prices
 available from 130 days before the flight to the day of.  Data was not
 necessarily available for each day.  There were 12 routes available.
 Data was given in the form of csv files, which ranged in size from 13M
-to 2.3G. We show a sample of such data in
-Figure~\ref{PARFCO_SAT_7_nonorm} for flights between Paris and Rome
-from Saturday to Saturday.  In Figure~\ref{PARRUN_SAT_7_nonorm}, we
-show data for Paris--Ile Réunion, also for a Saturday-to-Saturday
-trip.  While both show a large amount of variance, the Paris-Rome trip
-shows a stronger tendency for the price to rise nearer the travel date
-than the Paris--Réunion trip.  
-
-%FIXME: we created a python script which deals with this kind of
-%thing.
+to 2.3G.  We created a \texttt{python} script to read and analyze the
+data, which is available at
+\url{https://github.com/malcolmroberts/seme2016}.  We show a sample of
+such data in Figure~\ref{PARFCO_SAT_7_nonorm} for flights between
+Paris and Rome from Saturday to Saturday.  In
+Figure~\ref{PARRUN_SAT_7_nonorm}, we show data for Paris--Ile Réunion,
+also for a Saturday-to-Saturday trip.  While both show a large amount
+of variance, the Paris-Rome trip shows a stronger tendency for the
+price to rise nearer the travel date than the Paris--Réunion trip.
 
 \begin{figure}
   \begin{center}
@@ -146,11 +148,14 @@ than the Paris--Réunion trip.
 The probability of an asking price $p_d$ being achieved during a
 search interval $T$ is denoted by $\alpha$.  Let $p(t)$ denote the
 minimum price at time $t$, in days, for the a given flight, and $t_0$
-the time when the traveller starts looking for a ticket.  As a rough
-estimate, OptionWay uses the following formula to predict the
-probability that the client will succeed:
+the time when the traveller starts looking for a ticket.
+
+\subsection{OptionWay Estimator}
+As a rough estimate, OptionWay uses the following formula to predict
+the probability that the client will succeed:
 \begin{dmath}
-  \alpha_{\rm{OW}}(t_o,T,p_d) = \frac{1}{1 + \frac{4500 p(t_0)}{4.5 T}e^{-11 p_d / p(t_0)}}.
+  \alpha_{\rm{OW}}(t_o,T,p_d)
+  = \frac{1}{1 + \frac{4500 p(t_0)}{4.5 T}e^{-11 p_d / p(t_0)}}.
   \label{owalpha}
 \end{dmath}
 The motivation behind this formula was to construct a function that
@@ -244,7 +249,65 @@ designed to deal with the variance in prices, but neglects any trend.
 \end{figure}
 
 
-FIXME: mention our own hack, say that it might work better.
+\subsection{Alternative Estimators}
+
+OptionWay's predictor given in equation~\eqref{owalpha} has several
+parameters, and an obvious possibilty for improving the accuracy of
+the prediction is to fit these parameters to the data.  We computed
+the $L_2$ error and tried to find the optimal parameters for each
+route and $t_0$ using the Broyden–Fletcher–Goldfarb–Shanno (BFGS)
+algorithm.  The advantage of this technique is that one can find
+optimal parameter values for each individual case, which will, in
+general, give much a much better prediction.  The method is
+computationally expensive, and during the workshop we were able to
+calculate a handful of cases.  When calibrated with 50 flights, the
+$l_2$ error was reduced by approximately two orders of magnitude,
+which is a significant improvement.  Given more time, it would be
+interesting to continue this study.
+
+We also looked at an alternative form for $\alpha$ based upon ad-hoc
+reasoning for how the likelihood of finding a flight should behave.
+The formula is givne in equation~\eqref{anew}, where $\pmin$ is the
+global minimum price for the route, $a=8$, $b=12$, $c=7$, $d=7$,
+$e=0.01$, and $S_0=10$ are adjustable paramters, $T_f$ is the time
+remaining before the flight, and the score $S$ is given in
+equation~\eqref{S}.  The motivation behind equation~\eqref{anew} is
+that we penalize unlikely or impossible outcomes based, treat the
+price as having constant mean and variance, and use more information
+(and tunable parameters) in order to better match the data.
+\begin{dmath}
+  \label{anew}
+  \anew = \frac{1}{
+    1
+    + \exp{\(S_0-S\)}
+    + \frac{d}{T+10^{-6}}
+    + e\frac{\pmin}{\max{\( p(t_0) - \pmin, 10^{-14}\)}}}
+\end{dmath}
+\begin{dmath}
+  \label{S}
+  S = a \frac{p_d}{p(t_0)} + b \(1 - \frac{\pmin}{p(t_0)}\) + c \frac{T}{T_f}
+\end{dmath}
+The $\frac{1}{T+10^{-6}}$ term penalizes those who are impatient, and
+the $\frac{\pmin}{\max{\( p(t_0) - \pmin, 10^{-6}\)}}$ penalizes those
+who are asking for a price below what is historically possible.  The
+$\exp{\(S_0-S\)}$ term penalizes asking prices which are too cheap,
+and also reinforces some of the same properties as found in the other
+terms.
+
+FIXME: add results for $\anew$.
+
+
+%% \begin{figure}
+%%   \begin{center}
+%%     % ./rundiffA1.sh
+%%     % diff1/PARFCO_MON_123/normvst0.dat,diff1/PARMAD_SAT_7/normvst0.dat,diff1/PARFCO_MON_45/normvst0.dat,diff1/PARNYC_SAT_7/normvst0.dat,diff1/PARFCO_SAT_7/normvst0.dat,diff1/PARRUN_ALL/normvst0.dat,diff1/PARMAD_MON_123/normvst0.dat,diff1/PARRUN_SAT_7/normvst0.dat,diff1/PARMAD_MON_45/normvst0.dat
+%%     %asy datagraphs -u"dolegend=true" -u"legendlist=\"PARFCO_MON_123,PARMAD_SAT_7,PARFCO_MON_45,PARNYC_SAT_7,PARFCO_SAT_7,PARRUN_ALL,PARMAD_MON_123,PARRUN_SAT_7,PARMAD_MON_45\""
+%%     \includegraphics{pdf/plotA0}
+%%     \label{plotA0}
+%%     \caption{Difference between $\alpha_{\rm{OW}}$ and
+%%       $\alpha_{\rm{obs}}$ as a function of $t_0$.}
+%%   \end{center}
+%% \end{figure}
 
 \section{Conclusion}
 

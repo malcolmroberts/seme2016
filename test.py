@@ -67,13 +67,13 @@ def falpha(pt0, T, pdemand):
 
 def falphaWithMin(pt0, T, pdemand,minPrice):
     Tf=130
-    beta=8
-    gamma=12
-    delta=7
-    theta=7 #Warning: this one is in days
+    beta=8 # a
+    gamma=12 # b
+    delta=7 #c
+    theta=7 #Warning: this one is in days # d
     S=beta*pdemand/pt0+gamma*(1-minPrice/pt0)+delta*T/Tf
     S0=10
-    theta2=0.01
+    theta2=0.01 # e
     return 1.0 / (1.0 + np.exp( -(S - S0) ) + theta / (T + 0.00001) \
                   + theta2 * minPrice / ( max(pdemand - minPrice, 0.000001) ) )
 
