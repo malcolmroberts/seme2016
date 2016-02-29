@@ -45,7 +45,16 @@
 \maketitle
 
 \begin{abstract}
-  asdfasdfasdf FIXME
+  We report on the \emph{Semaines d'Etude Maths-Entreprises} OptionWay
+  (\url{https://www.optionway.com}) project.  OptionWay is an online
+  travel agent which allows clients to buy flights for cheaper by
+  taking into account the stochasticity of flight price over time.  In
+  order help clients make useful decisions, they offer an estimate of
+  how likely an asking price is likely to be realiastic.  The
+  objectives for the workshop were to test this estimator, and, if
+  time permits, to improve this estimator.  We show that the estimator
+  is overly optimistic and show early work on developing an
+  alternative.
 \end{abstract}
 
 \section{Introduction}
@@ -87,14 +96,14 @@ Friday night, the vast majority will probably find the use of their
 time sub-optimal for what may end up being a fairly minimal savings in
 cost.
 
-The online travel agent OptionWay autmoates this process; the
-traveller specifies their destination and travel dates, the price that
-they are willing to pay for the trip, and the length of time that they
-want OptionWay to look for the ticket.  If their criteria are
-satisfied during this time, OptionWay automatically buys the ticket
-when the specified price is available.  Using this method, the
-traveller is saved the drudgery of manually searching for flights on a
-daily basis.
+The online travel agent OptionWay (\url{https://www.optionway.com})
+autmoates this process; the traveller specifies their destination and
+travel dates, the price that they are willing to pay for the trip, and
+the length of time that they want OptionWay to look for the ticket.
+If their criteria are satisfied during this time, OptionWay
+automatically buys the ticket when the specified price is available.
+Using this method, the traveller is saved the drudgery of manually
+searching for flights on a daily basis.
 
 However, the demand price may or may not be likely to appear in the
 specified search period.  For example, if the traveller wants to fly
@@ -112,9 +121,10 @@ necessarily available for each day.  There were 12 routes available.
 Data was given in the form of csv files, which ranged in size from 13M
 to 2.3G.  We created a \texttt{python} script to read and analyze the
 data, which is available at
-\url{https://github.com/malcolmroberts/seme2016}.  We show a sample of
-such data in Figure~\ref{PARFCO_SAT_7_nonorm} for flights between
-Paris and Rome from Saturday to Saturday.  In
+\url{https://github.com/malcolmroberts/seme2016}.  Not all data files
+were analyzed due to limited time and computational resources.  We
+show a sample of such data in Figure~\ref{PARFCO_SAT_7_nonorm} for
+flights between Paris and Rome from Saturday to Saturday.  In
 Figure~\ref{PARRUN_SAT_7_nonorm}, we show data for Paris--Ile Réunion,
 also for a Saturday-to-Saturday trip.  While both show a large amount
 of variance, the Paris-Rome trip shows a stronger tendency for the
@@ -292,34 +302,70 @@ the $\frac{\pmin}{\max{\( p(t_0) - \pmin, 10^{-6}\)}}$ penalizes those
 who are asking for a price below what is historically possible.  The
 $\exp{\(S_0-S\)}$ term penalizes asking prices which are too cheap,
 and also reinforces some of the same properties as found in the other
-terms.
-
-FIXME: add results for $\anew$.
-
-
-%% \begin{figure}
-%%   \begin{center}
-%%     % ./rundiffA1.sh
-%%     % diff1/PARFCO_MON_123/normvst0.dat,diff1/PARMAD_SAT_7/normvst0.dat,diff1/PARFCO_MON_45/normvst0.dat,diff1/PARNYC_SAT_7/normvst0.dat,diff1/PARFCO_SAT_7/normvst0.dat,diff1/PARRUN_ALL/normvst0.dat,diff1/PARMAD_MON_123/normvst0.dat,diff1/PARRUN_SAT_7/normvst0.dat,diff1/PARMAD_MON_45/normvst0.dat
-%%     %asy datagraphs -u"dolegend=true" -u"legendlist=\"PARFCO_MON_123,PARMAD_SAT_7,PARFCO_MON_45,PARNYC_SAT_7,PARFCO_SAT_7,PARRUN_ALL,PARMAD_MON_123,PARRUN_SAT_7,PARMAD_MON_45\""
-%%     \includegraphics{pdf/plotA0}
-%%     \label{plotA0}
-%%     \caption{Difference between $\alpha_{\rm{OW}}$ and
-%%       $\alpha_{\rm{obs}}$ as a function of $t_0$.}
-%%   \end{center}
-%% \end{figure}
+terms.  As can be seen in Figure~\ref{plotA1}, equation~\eqref{anew}
+gives a much smaller prediction error than equation~\eqref{owalpha}.
+However, the error does tend to inrease when the departure date and
+$t_0$ are close; this can be explained by the fact that
+equation~\eqref{anew} was designed based upon a simplified model where
+the mean price does not change with time.  For certain groups of
+flights, this is clearly not the case.  However, the new method does
+provide a more accurate prediction.  The fact that it has more tunable
+paraemters allows it to be tuned to a particular problem, though there
+is the risk that one can over-tune the model.
+\begin{figure}
+  \begin{center}
+    % ./rundiffA1.sh
+    % diff1/PARFCO_MON_123/normvst0.dat,diff1/PARMAD_SAT_7/normvst0.dat,diff1/PARFCO_MON_45/normvst0.dat,diff1/PARNYC_SAT_7/normvst0.dat,diff1/PARFCO_SAT_7/normvst0.dat,diff1/PARRUN_ALL/normvst0.dat,diff1/PARMAD_MON_123/normvst0.dat,diff1/PARRUN_SAT_7/normvst0.dat,diff1/PARMAD_MON_45/normvst0.dat
+    %asy datagraphs -u"dolegend=false" -u"legendlist=\"PARFCO_MON_123,PARMAD_SAT_7,PARFCO_MON_45,PARNYC_SAT_7,PARFCO_SAT_7,PARRUN_ALL,PARMAD_MON_123,PARRUN_SAT_7,PARMAD_MON_45\""
+    \includegraphics{pdf/plotA1}
+    \label{plotA1}
+    \caption{Difference between $\anew$ and $\alpha_{\rm{obs}}$ as a
+      function of $t_0$.}
+  \end{center}
+\end{figure}
 
 \section{Conclusion}
 
-FIXME: Summary of what has been done.
+During the Semaines d'Etude Maths-Entreprises, OptionWay presented us
+with the problematic of creating a test to determine the accuracy of
+their probability estimator which is used to determing whether an
+asking price for a certain flight will be available during a given
+search window.  They provided us with a several data sets which we
+used to test this hypothesis, and we were able to show that their
+estimate was much too optimistic in the vast majority of cases.  In
+addition, we were able to perform some initial work on determining
+optimal parameters for their estimator, and also proposed an
+alternative estimator.  Our alternative estimator has more parameters,
+and has better precision, but requires more knowledge of the price
+history.
 
-FIXME: Future work: look at the distribution.  They are also talking with a
-data lab at INRIA who are applying a more statistical model. 
+Both our estimator and OptionWay's estimator have hand-selected
+parameters.  In the time allotted, we were able to numerically
+optimise the parameters for OptionWay's estimator certain cases, and
+it would be interesting to continue this process for both OptionWay's
+estimator and our new proposed estimator.  However, both estimators
+had different performance based upon the behaviour of prices on the
+particular route, which can be grouped into roughtly two types; one,
+where the average price is constant, and one where there is an
+increase in price starting about 40 days before departure.  This
+indicates that a clustering analysis could be of use to determine
+which type of behaviour is present, and then have design a model for
+each cluster, giving a balance between precision and generality of the
+model.  Finally, the problem faced by OptionWay is closely related to
+well-studied problems in financial mathematics, and attack via a
+statistical techniques is likely to give the best results.  We
+understand that OptionWay is in the process of developing such a model
+with an INRIA research group, and it will be interesting to see what level
+of precision can be achieved.
 
-FIXME: Also, look at clustering, particularly so that one can apply
-the information to new routes for which one does not yet have a huge
-amount of (expensive) data.
-
-FIXME: acknowledgements.
+\renewcommand{\abstractname}{Acknowledgements}
+\begin{abstract}
+  We would like to think that Semaines d'Etude Maths-Entreprises
+  organizers, Didier Auroux, Cédric Boulbe, and Laurent Busé for their
+  excellent work organizing this workshop.  We would also like to
+  thank OptionWay (\url{https://www.optionway.com}), and in particular
+  Nicolas Helin, Billy Girboux, and FIXME, for their help and
+  participation during the workshop.
+\end{abstract}
 
 \end{document}
